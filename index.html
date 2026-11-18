@@ -239,6 +239,90 @@ function profilePoints(tempC, timeH, cs, c0, n = 150) {
   return pts;
 }
 // === PHYSICS END ===
+// === APP START ===
+const state = { chart: null };
+const $ = id => document.getElementById(id);
+
+function readParams() {
+  return {
+    tempC: parseFloat($('tempSlider').value),
+    timeH: parseFloat($('timeSlider').value),
+    cs: parseFloat($('surfSlider').value),
+    c0: parseFloat($('coreSlider').value),
+  };
+}
+
+function updateSliderFill(el) {
+  const pct = ((el.value - el.min) / (el.max - el.min)) * 100;
+  el.style.setProperty('--fill', pct + '%');
+}
+
+function updateReadouts(p) {
+  $('tempVal').innerHTML = `${Math.round(p.tempC)}<small>°C</small>`;
+  $('timeVal').innerHTML = `${p.timeH.toFixed(1)}<small>h</small>`;
+  $('surfVal').innerHTML = `${p.cs.toFixed(2)}<small>wt%</small>`;
+  $('coreVal').innerHTML = `${p.c0.toFixed(2)}<small>wt%</small>`;
+}
+
+const SUPERSCRIPT = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+function superscript(n) {
+  return String(n).split('').map(ch => SUPERSCRIPT[ch] ?? ch).join('');
+}
+
+function updateStats(p) {
+  const D = diffusivity(p.tempC);
+  const exp = Math.floor(Math.log10(D));
+  const mantissa = D / Math.pow(10, exp);
+  $('dVal').innerHTML = `${mantissa.toFixed(2)}<small> ×10${superscript(exp)} m²/s</small>`;
+
+  const lenMm = Math.sqrt(D * p.timeH * 3600) * 1000;
+  $('lenVal').innerHTML = `${lenMm.toFixed(2)}<small> mm</small>`;
+
+  const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  const depthCard = $('depthCard');
+  if (d === null) {
+    $('depthVal').innerHTML = `&gt; 3.00<small> mm</small>`;
+    depthCard.classList.add('beyond');
+  } else {
+    $('depthVal').innerHTML = `${(d * 1000).toFixed(2)}<small> mm</small>`;
+    depthCard.classList.remove('beyond');
+  }
+}
+
+function updateChart(p) {
+  if (typeof renderChart === 'function') renderChart(p);
+}
+
+function updateAll() {
+  const p = readParams();
+  updateReadouts(p);
+  updateStats(p);
+  updateChart(p);
+}
+
+for (const id of ['tempSlider', 'timeSlider', 'surfSlider', 'coreSlider']) {
+  const el = $(id);
+  el.addEventListener('input', () => {
+    updateSliderFill(el);
+    updateAll();
+  });
+  updateSliderFill(el);
+}
+
+document.querySelectorAll('.preset').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $('tempSlider').value = btn.dataset.t;
+    $('timeSlider').value = btn.dataset.time;
+    $('surfSlider').value = btn.dataset.cs;
+    $('coreSlider').value = btn.dataset.c0;
+    document.querySelectorAll('.preset').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('input[type=range]').forEach(updateSliderFill);
+    updateAll();
+  });
+});
+
+updateAll();
+// === APP END ===
 </script>
 
 </body>
