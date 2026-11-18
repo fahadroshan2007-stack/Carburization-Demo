@@ -117,4 +117,11 @@ function load(dom) {
   delete global.Chart;
 }
 
+// Case 5: at load, the preset matching slider defaults (8620H) is marked active
+{
+  const m = html.match(/<button class="preset([^"]*)"[^>]*data-t="920"/);
+  assert.ok(m, 'default 8620H preset button not found');
+  assert.match(m[1], /\bactive\b/, 'default 8620H preset should carry .active to match initial slider values');
+}
+
 console.log('app-smoke.mjs: all assertions passed');
