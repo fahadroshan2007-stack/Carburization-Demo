@@ -180,7 +180,7 @@
   </div>
   <div class="note-card">
     <h3>Assumptions</h3>
-    Semi-infinite solid; constant surface carbon (infinite source); constant D over the treatment range; no phase-change or moving-boundary effects; planar 1-D geometry.
+    Semi-infinite solid; constant surface carbon (infinite source); constant D over the treatment range; no phase-change or moving-boundary effects; planar 1-D geometry. Effective case depth is the depth at which C = 0.40 wt%, solved by bisection.
   </div>
 </div>
 
@@ -394,7 +394,11 @@ function updateStats(p) {
 }
 
 function updateChart(p) {
-  if (typeof renderChart === 'function') renderChart(p);
+  try {
+    if (typeof renderChart === 'function') renderChart(p);
+  } catch (err) {
+    console.warn('Chart update skipped:', err);
+  }
 }
 
 function updateAll() {
@@ -427,6 +431,21 @@ document.querySelectorAll('.preset').forEach(btn => {
 
 updateAll();
 // === APP END ===
+</script>
+
+<script>
+// KaTeX equations — independent of the APP block so a blocked CDN here
+// cannot stop the simulator, and vice versa.
+try {
+  if (typeof katex !== 'undefined') {
+    katex.render(String.raw`D(T) = 2.3 \times 10^{-5} \exp\!\left(-\frac{148\,000}{8.314 \, (T + 273.15)}\right) \;\; [\mathrm{m^2\,s^{-1}}]`,
+      document.getElementById('eq1'), { displayMode: true, throwOnError: false });
+    katex.render(String.raw`C(x,t) = C_s - (C_s - C_0)\,\operatorname{erf}\!\left(\frac{x}{2 \sqrt{D \, t}}\right)`,
+      document.getElementById('eq2'), { displayMode: true, throwOnError: false });
+  }
+} catch (err) {
+  console.warn('KaTeX render skipped:', err);
+}
 </script>
 
 </body>
