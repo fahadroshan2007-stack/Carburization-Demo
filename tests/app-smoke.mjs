@@ -39,6 +39,11 @@ function buildDom() {
     surfVal: makeEl('surfVal'), coreVal: makeEl('coreVal'),
     dVal: makeEl('dVal'), depthVal: makeEl('depthVal'), lenVal: makeEl('lenVal'),
     depthCard: makeEl('depthCard'),
+    profileChart: Object.assign(makeEl('profileChart'), {
+      getContext: () => ({
+        createLinearGradient: () => ({ addColorStop() {} }),
+      }),
+    }),
   };
   const document = {
     getElementById: id => els[id],
@@ -86,6 +91,30 @@ function load(dom) {
   updateAll();
   assert.match(els.depthVal.innerHTML, /\d\.\d{2}<small> mm/, `expected mm depth, got: ${els.depthVal.innerHTML}`);
   assert.ok(!els.depthCard.classList.contains('beyond'));
+}
+
+// Case 4: chart renders through a Chart stub; update mutates instead of recreating
+{
+  const instances = [];
+  global.Chart = class {
+    constructor(ctx, cfg) { this.data = cfg.data; this.options = cfg.options; this.$caseDepth = undefined; instances.push(this); }
+    update() {}
+    destroy() {}
+  };
+  const dom = buildDom();
+  const { els } = dom;
+  els.tempSlider.value = '920'; els.timeSlider.value = '4';
+  els.surfSlider.value = '1.10'; els.coreSlider.value = '0.20';
+  const { updateAll } = load(dom);
+  updateAll();
+  assert.equal(instances.length, 1, 'chart should be created once');
+  assert.equal(instances[0].data.datasets[0].data.length, 150);
+  assert.ok(instances[0].$caseDepth > 0 && instances[0].$caseDepth < 0.003,
+    `case depth out of range: ${instances[0].$caseDepth}`);
+  els.tempSlider.value = '1050';
+  updateAll();
+  assert.equal(instances.length, 1, 'slider drag must update, not recreate, the chart');
+  delete global.Chart;
 }
 
 console.log('app-smoke.mjs: all assertions passed');

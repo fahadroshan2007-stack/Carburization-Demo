@@ -243,6 +243,110 @@ function profilePoints(tempC, timeH, cs, c0, n = 150) {
 const state = { chart: null };
 const $ = id => document.getElementById(id);
 
+const caseDepthLine = {
+  id: 'caseDepthLine',
+  afterDatasetsDraw(chart) {
+    const { ctx, chartArea, scales: { x, y } } = chart;
+    if (!chartArea) return;
+    const yPos = y.getPixelForValue(0.4);
+    ctx.save();
+    ctx.strokeStyle = '#f87171';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    ctx.moveTo(chartArea.left, yPos);
+    ctx.lineTo(chartArea.right, yPos);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#f87171';
+    ctx.font = "11px 'JetBrains Mono', monospace";
+    ctx.textAlign = 'right';
+    ctx.fillText('0.40 wt%', chartArea.right - 4, yPos - 6);
+    const d = chart.$caseDepth; // meters, null when not reached in 3 mm
+    if (d !== null && d !== undefined) {
+      const xPos = x.getPixelForValue(d * 1000);
+      ctx.beginPath();
+      ctx.arc(xPos, yPos, 5, 0, Math.PI * 2);
+      ctx.fillStyle = '#f87171';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#0b0f17';
+      ctx.stroke();
+      ctx.fillStyle = '#ffd166';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${(d * 1000).toFixed(2)} mm`, xPos, yPos - 12);
+    }
+    ctx.restore();
+  },
+};
+
+function renderChart(p) {
+  if (typeof Chart === 'undefined') return; // CDN unavailable — stats still work
+  const pts = profilePoints(p.tempC, p.timeH, p.cs, p.c0).map(pt => ({ x: pt.x, y: pt.c }));
+  const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  if (state.chart) {
+    state.chart.data.datasets[0].data = pts;
+    state.chart.$caseDepth = d;
+    state.chart.update('none');
+    return;
+  }
+  const ctx = $('profileChart').getContext('2d');
+  const gradient = ctx.createLinearGradient(0, 0, 0, 380);
+  gradient.addColorStop(0, 'rgba(245,165,36,0.55)');
+  gradient.addColorStop(1, 'rgba(245,165,36,0)');
+  state.chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      datasets: [{
+        label: 'C(x,t)',
+        data: pts,
+        parsing: false,
+        borderColor: '#f5a524',
+        borderWidth: 3.5,
+        tension: 0.35,
+        pointRadius: 0,
+        fill: true,
+        backgroundColor: gradient,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'nearest', intersect: false },
+      scales: {
+        x: {
+          type: 'linear', min: 0, max: 3,
+          title: { display: true, text: 'Depth x (mm)', color: '#8b96b0', font: { family: "'JetBrains Mono', monospace", size: 12 } },
+          ticks: { color: '#8b96b0', font: { family: "'JetBrains Mono', monospace" } },
+          grid: { color: '#263049' },
+        },
+        y: {
+          min: 0, suggestedMax: 1.3,
+          title: { display: true, text: 'C (wt%)', color: '#8b96b0', font: { family: "'JetBrains Mono', monospace", size: 12 } },
+          ticks: { color: '#8b96b0', font: { family: "'JetBrains Mono', monospace" } },
+          grid: { color: '#263049' },
+        },
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a2233',
+          titleColor: '#ffd166',
+          bodyColor: '#e7ebf4',
+          borderColor: '#263049',
+          borderWidth: 1,
+          callbacks: {
+            label: item => `C = ${item.parsed.y.toFixed(2)} wt% @ ${item.parsed.x.toFixed(2)} mm`,
+          },
+        },
+      },
+    },
+    plugins: [caseDepthLine],
+  });
+  state.chart.$caseDepth = d;
+  state.chart.update('none');
+}
+
 function readParams() {
   return {
     tempC: parseFloat($('tempSlider').value),
