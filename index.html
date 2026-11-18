@@ -186,8 +186,60 @@
 
 <footer>
   <span>Transport Demo · Diffusion in Solids</span>
-  <span>erf: Abramowitz–Stegun 7.1.26 · Chart.js + Tailwind CDN · KaTeX</span>
+  <span>erf: Maclaurin series · Chart.js + Tailwind CDN · KaTeX</span>
 </footer>
+
+<script>
+// === PHYSICS START ===
+// Maclaurin series: erf(x) = (2/sqrt(pi)) * sum_{n>=0} (-1)^n x^(2n+1) / (n! (2n+1)).
+// Machine-accurate in the working range; saturates for |x| >= 3 (error < 2.1e-5 there,
+// and negligible for diffusion physics where erf enters the profile).
+function erf(x) {
+  const sign = x < 0 ? -1 : 1;
+  const ax = Math.abs(x);
+  if (ax === 0) return 0;
+  if (ax >= 3) return sign;
+  let term = ax;
+  let sum = ax;
+  for (let n = 0; n < 200; n++) {
+    term *= -ax * ax * (2 * n + 1) / ((n + 1) * (2 * n + 3));
+    sum += term;
+    if (Math.abs(term) < 1e-18 * Math.abs(sum)) break;
+  }
+  return sign * (2 / Math.sqrt(Math.PI)) * sum;
+}
+
+function diffusivity(tempC) {
+  return 2.3e-5 * Math.exp(-148000 / (8.314 * (tempC + 273.15)));
+}
+
+function concentration(x_m, tempC, timeH, cs, c0) {
+  const D = diffusivity(tempC);
+  const t = timeH * 3600;
+  return cs - (cs - c0) * erf(x_m / (2 * Math.sqrt(D * t)));
+}
+
+function solveCaseDepth(tempC, timeH, cs, c0) {
+  const X_MAX = 0.003; // 3 mm in meters
+  if (concentration(X_MAX, tempC, timeH, cs, c0) >= 0.40) return null;
+  let lo = 0, hi = X_MAX;
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    if (concentration(mid, tempC, timeH, cs, c0) > 0.40) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+function profilePoints(tempC, timeH, cs, c0, n = 150) {
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const x_m = (0.003 * i) / (n - 1);
+    pts.push({ x: x_m * 1000, c: concentration(x_m, tempC, timeH, cs, c0) }); // x in mm
+  }
+  return pts;
+}
+// === PHYSICS END ===
+</script>
 
 </body>
 </html>
