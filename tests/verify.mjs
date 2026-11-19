@@ -45,6 +45,13 @@ assert.equal(solveCaseDepth(920, 4, 1.1, 0.5), null);
 assert.ok(profilePoints(800, 1, 0.8, 0).every(p => Number.isFinite(p.c)));
 assert.ok(profilePoints(1050, 24, 1.3, 0).every(p => Number.isFinite(p.c)));
 
+// --- structural: no duplicate function declarations in the PHYSICS block ---
+{
+  const fns = [...match[1].matchAll(/^function\s+([A-Za-z_$][\w$]*)\s*\(/gm)].map(m => m[1]);
+  const dupes = fns.filter((f, i) => fns.indexOf(f) !== i);
+  assert.deepEqual(dupes, [], `duplicate function declarations in PHYSICS block: ${dupes.join(', ')}`);
+}
+
 // --- depth expansion: pure physics ---
 // erfcQuadrature: independent algorithm, must agree with erf
 for (const x of [0, 0.5, 1, 1.5, 2]) assert.ok(Math.abs(erf(x) - (1 - erfcQuadrature(x))) < 1e-12, `erfcQuadrature(${x})`);

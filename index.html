@@ -243,7 +243,7 @@
 
 <section class="band" id="consequences" aria-label="Consequences at the current settings">
   <h2 class="band-h">Consequences at the current settings</h2>
-  <div class="verdict ok" id="verdict"></div>
+  <div class="verdict ok" id="verdict" aria-live="polite"></div>
   <div class="cq-cards" id="cqCards"></div>
 </section>
 
@@ -388,14 +388,6 @@ function solveCaseDepth(tempC, timeH, cs, c0) {
   return (lo + hi) / 2;
 }
 
-function profilePoints(tempC, timeH, cs, c0, n = 150) {
-  const pts = [];
-  for (let i = 0; i < n; i++) {
-    const x_m = (0.003 * i) / (n - 1);
-    pts.push({ x: x_m * 1000, c: concentration(x_m, tempC, timeH, cs, c0) }); // x in mm
-  }
-  return pts;
-}
 function profilePoints(tempC, timeH, cs, c0, n = 150) {
   const pts = [];
   for (let i = 0; i < n; i++) {
@@ -675,7 +667,7 @@ function renderConsequences(p) {
   let depthBig, depthPill, depthPillCls, depthBody, meterFill, showMarker = true;
   if (d === null) {
     depthBig = '&gt; 3.00<small> mm</small>'; depthPill = 'deeper than window'; depthPillCls = 'crit';
-    depthBody = 'C(3 mm) ≥ 0.40 wt% at this hold time — the 0.40 wt% contour has not reached the window edge yet. Increase hold time or shift to √(Dt) math.';
+    depthBody = 'C(3 mm) ≥ 0.40 wt% at this hold time — the 0.40 wt% contour has not reached the far side yet. Increase hold time or raise the temperature.';
     meterFill = 100; showMarker = false;
   } else {
     depthBig = depthMm.toFixed(2) + '<small> mm</small>';
@@ -713,7 +705,7 @@ function renderConsequences(p) {
   // card 5 — carbon uptake
   const card5 = `<div class="card cq" id="cardUptake"><span class="pill info">semi-infinite</span><h3>Carbon taken up</h3>
     <div class="big">${uptake.toFixed(2)}<small> mg/cm²</small></div>
-    <p class="sub">Closed form 2(Cs−C₀)√(Dt/π). The conservation check on the left-hand profile integral; matches card 3 when the profile is right.</p></div>`;
+    <p class="sub">Closed form 2(Cs−C₀)√(Dt/π). This is the mass-balance row of the verification table, shown in shop-floor units.</p></div>`;
 
   // card 6 — time to 1.0 mm
   const card6 = `<div class="card cq" id="cardTime1mm"><span class="pill info">target 1.0 mm</span><h3>Time to 1.0 mm depth</h3>
