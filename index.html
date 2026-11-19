@@ -200,8 +200,8 @@
     </div>
 
     <div class="ctrl">
-      <div class="ctrl-head"><label for="surfSlider">Surface Carbon</label><div class="val" id="surfVal">1.10<small>wt%</small></div></div>
-      <input type="range" id="surfSlider" min="0.8" max="1.3" step="0.01" value="1.10" style="--fill:60%" aria-label="Surface carbon in weight percent">
+      <div class="ctrl-head"><label for="surfSlider">Surface Carbon</label><div class="val" id="surfVal">0.95<small>wt%</small></div></div>
+      <input type="range" id="surfSlider" min="0.8" max="1.3" step="0.01" value="0.95" style="--fill:30%" aria-label="Surface carbon in weight percent">
       <div class="ticks"><span>0.8</span><span>1.05</span><span>1.3</span></div>
     </div>
 
@@ -213,7 +213,7 @@
 
     <div class="label">Presets</div>
     <div class="presets">
-      <button class="preset active" data-t="920" data-time="4" data-cs="1.10" data-c0="0.20">8620H · 920°C · 4 h</button>
+      <button class="preset active" data-t="920" data-time="4" data-cs="0.95" data-c0="0.20">8620H · 920°C · 4 h</button>
       <button class="preset" data-t="950" data-time="6" data-cs="0.90" data-c0="0.10">1020 · 950°C · 6 h</button>
       <button class="preset" data-t="900" data-time="8" data-cs="1.15" data-c0="0.15">4320 · 900°C · 8 h</button>
     </div>
@@ -663,7 +663,7 @@ function renderConsequences(p) {
   const csHV = martensiteHV(p.cs), c0HV = martensiteHV(p.c0);
   const uptake = carbonUptakeMgCm2(p.cs, p.c0, D, t);
 
-  // card 1 — case depth vs 0.8–1.2 mm 8620H window
+  // card 1 — case depth vs 0.50 mm schedule target (scale marks honest to the pinned D)
   let depthBig, depthPill, depthPillCls, depthBody, meterFill, showMarker = true;
   if (d === null) {
     depthBig = '&gt; 3.00<small> mm</small>'; depthPill = 'deeper than window'; depthPillCls = 'crit';
@@ -671,24 +671,24 @@ function renderConsequences(p) {
     meterFill = 100; showMarker = false;
   } else {
     depthBig = depthMm.toFixed(2) + '<small> mm</small>';
-    const okSpec = depthMm >= 0.8 && depthMm <= 1.2;
-    const near = (depthMm >= 0.5 && depthMm < 0.8) || (depthMm > 1.2 && depthMm <= 1.5);
+    const okSpec = depthMm >= 0.5;
+    const near = depthMm >= 0.35 && depthMm < 0.5;
     depthPill = okSpec ? 'spec ok' : near ? 'near spec' : 'out of spec';
     depthPillCls = okSpec ? 'ok' : near ? 'warn' : 'crit';
-    depthBody = `50 HRC case depth. Typical 8620H practice targets 0.8–1.2 mm; below 0.8 mm the case won't survive the quench-to-service margin, above 1.5 mm you're carburizing a lot of air.`;
-    meterFill = Math.min(100, (depthMm / 1.5) * 100);
+    depthBody = `Depth of the 0.40 wt% contour — the 50 HRC case-depth definition. Scale shown to 1 mm; at longer holds or higher temperatures the same 0.40 line reaches 1+ mm.`;
+    meterFill = Math.min(100, (depthMm / 1.0) * 100);
   }
   const card1 = `<div class="card cq" id="cardDepth"><span class="pill ${depthPillCls}">${depthPill}</span><h3>Case depth @ 0.40 %C</h3>
     <div class="big">${depthBig}</div>
-    <div class="meter"><i style="width:${meterFill}%"></i>${showMarker ? `<b style="left:66.7%"></b>` : ''}</div>
+    <div class="meter"><i style="width:${meterFill}%"></i>${showMarker ? `<b style="left:50%"></b>` : ''}</div>
     <p class="sub">${depthBody}</p></div>`;
 
   // card 2 — surface carbon
-  const csPill = p.cs >= 0.9 ? 'crit' : p.cs >= 0.7 ? 'warn' : 'ok';
-  const csLabel = p.cs >= 0.9 ? 'carbide network' : p.cs >= 0.7 ? 'retained austenite' : 'in practice';
+  const csPill = p.cs >= 1.10 ? 'crit' : p.cs >= 0.85 ? 'warn' : 'ok';
+  const csLabel = p.cs >= 1.10 ? 'carbide network' : p.cs >= 0.85 ? 'retained austenite' : 'in practice';
   const card2 = `<div class="card cq" id="cardSurfaceC"><span class="pill ${csPill}">${csLabel}</span><h3>Surface carbon</h3>
     <div class="big">${p.cs.toFixed(2)}<small> wt%</small></div>
-    <p class="sub">${p.cs >= 0.9 ? 'Over-carburization: continuous carbide networks embrittle the grain boundaries and fail the part on first load cycle.' : p.cs >= 0.7 ? 'Above ≈0.7 wt% the austenite retains substantial martensite-below-room-temperature carbon; toughness drops and distortion rises.' : 'Common gas-carburizing surface range.'}</p></div>`;
+    <p class="sub">${p.cs >= 1.10 ? 'Over-carburization: continuous carbide networks embrittle the grain boundaries and fail the part on first load cycle.' : p.cs >= 0.85 ? 'Typical carburized surface — retained austenite expected; temper or refrigerate per practice.' : 'Common gas-carburizing surface range.'}</p></div>`;
 
   // card 3 — as-quenched hardness
   const card3 = `<div class="card cq" id="cardHV"><span class="pill info">untempered</span><h3>As-quenched hardness</h3>
@@ -716,16 +716,14 @@ function renderConsequences(p) {
 
   // verdict banner
   let vCls, vTitle, vBody;
-  if (p.cs >= 0.9) { vCls = 'crit'; vTitle = 'Over-carburized';
+  if (p.cs >= 1.10) { vCls = 'crit'; vTitle = 'Over-carburized';
     vBody = `Surface is at ${p.cs.toFixed(2)} wt% C — carbide networks at the prior austenite boundaries. This is a rejectable condition for cyclic parts, not a "deeper case" bonus.`; }
   else if (d === null) { vCls = 'warn'; vTitle = 'Deeper than the 3 mm window';
     vBody = `The 0.40 wt% contour hasn't crossed 3 mm. Physically that means a deep, fully enriched case — fine for heavy sections, but check for grain coarsening and overload at this temperature/time before calling it a win.`; }
-  else if (depthMm < 0.8) { vCls = 'warn'; vTitle = 'Shallow case';
-    vBody = `${depthMm.toFixed(2)} mm at 0.40 wt% — below the typical 0.8–1.2 mm 8620H window. Expect lower bending-fatigue life than the datasheet promises.`; }
-  else if (p.cs >= 0.7) { vCls = 'warn'; vTitle = 'High surface carbon';
-    vBody = `Case depth ok, but ${p.cs.toFixed(2)} wt% surface means retained austenite; temper or refrigerate, and re-check hardness after.`; }
+  else if (depthMm < 0.5) { vCls = 'warn'; vTitle = 'Shallow case';
+    vBody = `${depthMm.toFixed(2)} mm at 0.40 wt% — expect reduced bending-fatigue life. Longer hold or hotter soak gets you past 0.5 mm.`; }
   else { vCls = 'ok'; vTitle = 'Within carburizing practice';
-    vBody = `${depthMm.toFixed(2)} mm case at 0.40 wt% — a 50 HRC surface with a ductile core. This is the textbook outcome for 8620H.`; }
+    vBody = `${depthMm.toFixed(2)} mm case at 0.40 wt% — a 50 HRC surface with a ductile core. Retained austenite is expected at this level of surface C; temper or refrigerate per practice.`; }
   const v = $('verdict');
   v.className = 'verdict ' + vCls;
   v.innerHTML = `<b>${vTitle}</b>${vBody}`;
