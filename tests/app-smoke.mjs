@@ -86,14 +86,14 @@ function load(dom) {
   assert.match(dom.els.tempVal.innerHTML ?? dom.els.tempVal.textContent, /800/);
 }
 
-// Case 2: core 0.50 wt% — profile never reaches 0.40, depth must read > 3.00 mm
+// Case 2: core 0.50 wt% — no 0.40 wt% contour can form (C₀ ≥ 0.40)
 {
   const dom = buildDom();
   const { els } = dom;
   els.coreSlider.value = '0.5';
   const { updateAll } = load(dom);
   updateAll();
-  assert.match(els.depthVal.innerHTML, /(?:>|&gt;)\s*3\.00/, `expected bounded-case-depth message, got: ${els.depthVal.innerHTML}`);
+  assert.match(els.depthVal.innerHTML, /n\/a/, `expected n/a for noContour case, got: ${els.depthVal.innerHTML}`);
   assert.ok(els.depthCard.classList.contains('beyond'), 'depth card should carry .beyond styling');
 }
 
@@ -156,11 +156,11 @@ function load(dom) {
   els.surfSlider.value = '0.85'; els.coreSlider.value = '0.5';
   const { updateAll } = load(dom);
   updateAll();
-  assert.match(els.verdict.innerHTML, /deeper than the 3 mm window/i, `verdict: ${els.verdict.innerHTML}`);
-  assert.ok(els.cqCards.innerHTML.includes('&gt; 3.00'), `cardDepth must show the bounded message: ${els.cqCards.innerHTML}`);
+  assert.match(els.verdict.innerHTML, /No 0\.40 wt% case forms/i, `verdict: ${els.verdict.innerHTML}`);
+  assert.ok(els.cqCards.innerHTML.includes('no contour'), `cardDepth must degrade to the no-contour message: ${els.cqCards.innerHTML}`);
   assert.ok(!/NaN/.test(els.cqCards.innerHTML), 'cqCards must not contain NaN');
-  assert.ok(tbody.innerHTML.includes('n/a'), 'bisection row must degrade to n/a');
-  assert.ok(els.growthNote.textContent.includes('beyond'), `growth note must report truncation: ${els.growthNote.textContent}`);
+  assert.ok(tbody.innerHTML.includes('no contour'), 'bisection row must degrade to no contour');
+  assert.ok(els.growthNote.textContent.includes('No case forms'), `growth note: ${els.growthNote.textContent}`);
 }
 
 // Case 8: verification table renders live rows at defaults; uptake card formatted

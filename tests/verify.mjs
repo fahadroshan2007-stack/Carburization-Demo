@@ -97,6 +97,8 @@ assert.ok(danteD(950, 1.0) > danteD(950, 0.2), 'D(T,C) must rise with C');
   assert.ok(tS !== null && tS > 60 && tS < 200 * 3600, `timeToCaseDepth: ${tS}`);
   const d = solveCaseDepth(920, tS / 3600, 1.1, 0.2);
   assert.ok(d === null || Math.abs(d - 0.001) / 0.001 < 0.02, `round-trip: ${d}`);
+  // core already at 0.50 wt% — no 0.40 contour ever forms, must be null (not 0 s)
+  assert.equal(timeToCaseDepth(920, 1.1, 0.5, 0.001), null, 'no contour at C0>=0.40 must return null');
 }
 
 console.log('verify.mjs: all assertions passed');

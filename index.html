@@ -491,8 +491,10 @@ function fdProfile(cs, c0, tempC, timeH, xMax, n, carbonDep) {
 
 // Time (seconds) for the erf profile at temperature tempC to reach the
 // 0.40 wt% case depth at depth `target_m` (target < 3 mm). Bisection on t.
-// null when the depth never reaches target inside 200 h.
+// null when the depth never reaches target inside 200 h — or when no 0.40 wt%
+// contour can ever form (C0 >= 0.40, the profile never dips below it).
 function timeToCaseDepth(tempC, cs, c0, target_m) {
+  if (c0 >= 0.40) return null;
   const depthAt = (tH) => {
     const d = solveCaseDepth(tempC, tH, cs, c0);
     return d === null ? Infinity : d; // deeper than the 3 mm window
@@ -664,8 +666,13 @@ function renderConsequences(p) {
   const uptake = carbonUptakeMgCm2(p.cs, p.c0, D, t);
 
   // card 1 — case depth vs 0.50 mm schedule target (scale marks honest to the pinned D)
+  const noContour = p.c0 >= 0.40;
   let depthBig, depthPill, depthPillCls, depthBody, meterFill, showMarker = true;
-  if (d === null) {
+  if (noContour) {
+    depthBig = 'n/a<small> —</small>'; depthPill = 'no contour'; depthPillCls = 'info';
+    depthBody = 'Core carbon is already at or above 0.40 wt% — the 0.40 wt% contour never forms, so no case depth is defined. This is a through-hardening carbon range, not a carburizing one.';
+    meterFill = 0; showMarker = false;
+  } else if (d === null) {
     depthBig = '&gt; 3.00<small> mm</small>'; depthPill = 'deeper than window'; depthPillCls = 'crit';
     depthBody = 'C(3 mm) ≥ 0.40 wt% at this hold time — the 0.40 wt% contour has not reached the far side yet. Increase hold time or raise the temperature.';
     meterFill = 100; showMarker = false;
@@ -709,7 +716,7 @@ function renderConsequences(p) {
 
   // card 6 — time to 1.0 mm
   const card6 = `<div class="card cq" id="cardTime1mm"><span class="pill info">target 1.0 mm</span><h3>Time to 1.0 mm depth</h3>
-    <div class="big">${t1mm === null ? '&gt; 200' : (t1mm / 3600).toFixed(1)}<small> h</small></div>
+    <div class="big">${t1mm === null ? (p.c0 >= 0.40 ? 'n/a' : '&gt; 200') : (t1mm / 3600).toFixed(1)}<small>${p.c0 >= 0.40 ? '' : ' h'}</small></div>
     <p class="sub">At ${Math.round(p.tempC)} °C, Cs ${p.cs.toFixed(2)} vs C₀ ${p.c0.toFixed(2)} wt%. Parity with the √t law: doubling the target costs 4× the time.</p></div>`;
 
   $('cqCards').innerHTML = card1 + card2 + card3 + card4 + card5 + card6;
@@ -718,6 +725,8 @@ function renderConsequences(p) {
   let vCls, vTitle, vBody;
   if (p.cs >= 1.10) { vCls = 'crit'; vTitle = 'Over-carburized';
     vBody = `Surface is at ${p.cs.toFixed(2)} wt% C — carbide networks at the prior austenite boundaries. This is a rejectable condition for cyclic parts, not a "deeper case" bonus.`; }
+  else if (p.c0 >= 0.40) { vCls = 'warn'; vTitle = 'No 0.40 wt% case forms';
+    vBody = `Core carbon is already at ${p.c0.toFixed(2)} wt% — the 0.40 wt% contour never forms at any hold time or temperature. This is a through-hardening carbon range, not a carburizing schedule.`; }
   else if (d === null) { vCls = 'warn'; vTitle = 'Deeper than the 3 mm window';
     vBody = `The 0.40 wt% contour hasn't crossed 3 mm. Physically that means a deep, fully enriched case — fine for heavy sections, but check for grain coarsening and overload at this temperature/time before calling it a win.`; }
   else if (depthMm < 0.5) { vCls = 'warn'; vTitle = 'Shallow case';
@@ -732,6 +741,10 @@ function renderConsequences(p) {
 // ------------------------------------------------------------ growth chart
 function renderGrowth(p) {
   const note = $('growthNote');
+  if (p.c0 >= 0.40) {
+    if (note) note.textContent = 'No case forms at C₀ ≥ 0.40 — the 0.40 wt% contour never exists.';
+    return; // leave any prior chart in place rather than paint a misleading empty one
+  }
   const ax = state.growthAxis === 'rt' ? 'rt' : 't';
   const xv = (t) => (ax === 'rt' ? Math.sqrt(t) : t);
   const N = 50, pts = [], dArr = [];
@@ -878,7 +891,7 @@ function renderVerification(p) {
 
   // 3 — bisection residual
   if (d === null) {
-    rows.push(vRow('Bisection residual', 'C(solveCaseDepth) − 0.40', 'n/a', 'ok', 'n/a'));
+    rows.push(vRow('Bisection residual', 'C(solveCaseDepth) − 0.40', p.c0 >= 0.40 ? 'no contour' : 'n/a', 'ok', 'n/a'));
   } else {
     const r = Math.abs(concentration(d, p.tempC, p.timeH, p.cs, p.c0) - 0.4);
     rows.push(vRow('Bisection residual', 'C(solveCaseDepth) − 0.40', r.toExponential(2), r < 1e-9 ? 'ok' : 'crit', r < 1e-9 ? 'PASS' : 'FAIL'));
@@ -946,7 +959,7 @@ function updateStats(p) {
   const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
   const depthCard = $('depthCard');
   if (d === null) {
-    $('depthVal').innerHTML = `&gt; 3.00<small> mm</small>`;
+    $('depthVal').innerHTML = p.c0 >= 0.40 ? `n/a<small> —</small>` : `&gt; 3.00<small> mm</small>`;
     depthCard.classList.add('beyond');
   } else {
     $('depthVal').innerHTML = `${(d * 1000).toFixed(2)}<small> mm</small>`;
