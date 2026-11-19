@@ -145,6 +145,8 @@
   .vtable tr:last-child td { border-bottom: 0; }
   .vtable td.res { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
   .vtable th.num { text-align:right; }
+  .vtable td.muted { color: #93a0bd; }
+  .vtable.failed { box-shadow: 0 0 0 1px rgba(248,113,113,.45) inset; }
 
   .validity { position: relative; margin-bottom: 14px; padding-top: 6px; }
   .wbar { position: relative; height: 44px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
@@ -228,8 +230,10 @@
       <div class="chart-head">
         <h2>Carbon Concentration Profile</h2>
         <div class="legend">
-          <span><span class="dot" style="background:#f5a524"></span>C(x,t)</span>
+          <span><span class="dot" style="background:#f5a524"></span>C(x,t) erf · const-D</span>
+          <span><span class="dot" style="background:transparent;border-top:2px dashed #8b96b0;height:0;width:14px;border-radius:0"></span>D(T,C) DANTE</span>
           <span><span class="dot" style="background:transparent;border-top:2px dashed #f87171;height:0;width:14px;border-radius:0"></span>0.40 wt% limit</span>
+          <label class="overlay-toggle"><input type="checkbox" id="showCD" checked> D(T,C)</label>
         </div>
       </div>
       <div class="canvas-wrap"><canvas id="profileChart" aria-label="Carbon concentration versus depth chart"></canvas></div>
@@ -511,7 +515,7 @@ function timeToCaseDepth(tempC, cs, c0, target_m) {
 }
 // === PHYSICS END ===
 // === APP START ===
-const state = { chart: null };
+const state = { chart: null, growthChart: null, hardnessChart: null, growthAxis: 't', showCD: true };
 const $ = id => document.getElementById(id);
 
 const caseDepthLine = {
@@ -555,8 +559,11 @@ function renderChart(p) {
   if (typeof Chart === 'undefined') return; // CDN unavailable — stats still work
   const pts = profilePoints(p.tempC, p.timeH, p.cs, p.c0).map(pt => ({ x: pt.x, y: pt.c }));
   const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  const cdProfile = fdProfile(p.cs, p.c0, p.tempC, p.timeH, 0.003, 240, true);
+  const ptsCD = cdProfile.x.map((x, i) => ({ x: x * 1000, y: cdProfile.c[i] }));
   if (state.chart) {
     state.chart.data.datasets[0].data = pts;
+    state.chart.data.datasets[1].data = ptsCD;
     state.chart.$caseDepth = d;
     state.chart.update('none');
     return;
@@ -569,7 +576,7 @@ function renderChart(p) {
     type: 'line',
     data: {
       datasets: [{
-        label: 'C(x,t)',
+        label: 'C(x,t) — erf constant-D',
         data: pts,
         parsing: false,
         borderColor: '#f5a524',
@@ -578,6 +585,17 @@ function renderChart(p) {
         pointRadius: 0,
         fill: true,
         backgroundColor: gradient,
+      }, {
+        label: 'D(T,C) — DANTE-style',
+        data: ptsCD,
+        parsing: false,
+        borderColor: '#8b96b0',
+        borderWidth: 2,
+        borderDash: [7, 5],
+        tension: 0.35,
+        pointRadius: 0,
+        fill: false,
+        hidden: !state.showCD,
       }],
     },
     options: {
@@ -644,6 +662,287 @@ function superscript(n) {
   return String(n).split('').map(ch => SUPERSCRIPT[ch] ?? ch).join('');
 }
 
+// ------------------------------------------------------------ consequences
+function renderConsequences(p) {
+  const D = diffusivity(p.tempC), t = p.timeH * 3600;
+  const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  const depthMm = d === null ? null : d * 1000;
+  const t1mm = timeToCaseDepth(p.tempC, p.cs, p.c0, 0.001);
+  const csHV = martensiteHV(p.cs), c0HV = martensiteHV(p.c0);
+  const uptake = carbonUptakeMgCm2(p.cs, p.c0, D, t);
+
+  // card 1 — case depth vs 0.8–1.2 mm 8620H window
+  let depthBig, depthPill, depthPillCls, depthBody, meterFill, showMarker = true;
+  if (d === null) {
+    depthBig = '&gt; 3.00<small> mm</small>'; depthPill = 'deeper than window'; depthPillCls = 'crit';
+    depthBody = 'C(3 mm) ≥ 0.40 wt% at this hold time — the 0.40 wt% contour has not reached the window edge yet. Increase hold time or shift to √(Dt) math.';
+    meterFill = 100; showMarker = false;
+  } else {
+    const okSpec = depthMm >= 0.8 && depthMm <= 1.2;
+    const near = (depthMm >= 0.5 && depthMm < 0.8) || (depthMm > 1.2 && depthMm <= 1.5);
+    depthPill = okSpec ? 'spec ok' : near ? 'near spec' : 'out of spec';
+    depthPillCls = okSpec ? 'ok' : near ? 'warn' : 'crit';
+    depthBody = `50 HRC case depth. Typical 8620H practice targets 0.8–1.2 mm; below 0.8 mm the case won't survive the quench-to-service margin, above 1.5 mm you're carburizing a lot of air.`;
+    meterFill = Math.min(100, (depthMm / 1.5) * 100);
+  }
+  const card1 = `<div class="card cq" id="cardDepth"><span class="pill ${depthPillCls}">${depthPill}</span><h3>Case depth @ 0.40 %C</h3>
+    <div class="big">${depthBig}</div>
+    <div class="meter"><i style="width:${meterFill}%"></i>${showMarker ? `<b style="left:66.7%"></b>` : ''}</div>
+    <p class="sub">${depthBody}</p></div>`;
+
+  // card 2 — surface carbon
+  const csPill = p.cs >= 0.9 ? 'crit' : p.cs >= 0.7 ? 'warn' : 'ok';
+  const csLabel = p.cs >= 0.9 ? 'carbide network' : p.cs >= 0.7 ? 'retained austenite' : 'in practice';
+  const card2 = `<div class="card cq" id="cardSurfaceC"><span class="pill ${csPill}">${csLabel}</span><h3>Surface carbon</h3>
+    <div class="big">${p.cs.toFixed(2)}<small> wt%</small></div>
+    <p class="sub">${p.cs >= 0.9 ? 'Over-carburization: continuous carbide networks embrittle the grain boundaries and fail the part on first load cycle.' : p.cs >= 0.7 ? 'Above ≈0.7 wt% the austenite retains substantial martensite-below-room-temperature carbon; toughness drops and distortion rises.' : 'Common gas-carburizing surface range.'}</p></div>`;
+
+  // card 3 — as-quenched hardness
+  const card3 = `<div class="card cq" id="cardHV"><span class="pill info">untempered</span><h3>As-quenched hardness</h3>
+    <div class="big">${Math.round(csHV)}<small> HV</small></div>
+    <p class="sub">Core ${Math.round(c0HV)} HV · Idohara HV<sup>*</sup> [GPa] = 1.75 + 8.2·(%C) converted. True fully-solution martensite; real parts hold retained austenite above ≈0.7 wt% and measure lower.</p></div>`;
+
+  // card 4 — retained austenite risk
+  const raPill = p.cs >= 0.7 ? 'info' : p.cs >= 0.5 ? 'warn' : 'ok';
+  const raLabel = p.cs >= 0.7 ? 'expect RA' : p.cs >= 0.5 ? 'some RA' : 'low RA';
+  const card4 = `<div class="card cq" id="cardRA"><span class="pill ${raPill}">${raLabel}</span><h3>Retained austenite</h3>
+    <div class="big">${p.cs >= 0.7 ? 'present' : p.cs >= 0.5 ? 'watch' : 'minimal'}</div>
+    <p class="sub">${p.cs >= 0.7 ? 'RA expected; temper or refrigerate (e.g., −75 °C) to convert and stabilize the case.' : p.cs >= 0.5 ? 'Borderline — check with XRD if fatigue life matters.' : 'Below the RA-dominated regime.'}</p></div>`;
+
+  // card 5 — carbon uptake
+  const card5 = `<div class="card cq" id="cardUptake"><span class="pill info">semi-infinite</span><h3>Carbon taken up</h3>
+    <div class="big">${uptake.toFixed(2)}<small> mg/cm²</small></div>
+    <p class="sub">Closed form 2(Cs−C₀)√(Dt/π). The conservation check on the left-hand profile integral; matches card 3 when the profile is right.</p></div>`;
+
+  // card 6 — time to 1.0 mm
+  const card6 = `<div class="card cq" id="cardTime1mm"><span class="pill info">target 1.0 mm</span><h3>Time to 1.0 mm depth</h3>
+    <div class="big">${t1mm === null ? '&gt; 200' : (t1mm / 3600).toFixed(1)}<small> h</small></div>
+    <p class="sub">At ${Math.round(p.tempC)} °C, Cs ${p.cs.toFixed(2)} vs C₀ ${p.c0.toFixed(2)} wt%. Parity with the √t law: doubling the target costs 4× the time.</p></div>`;
+
+  $('cqCards').innerHTML = card1 + card2 + card3 + card4 + card5 + card6;
+
+  // verdict banner
+  let vCls, vTitle, vBody;
+  if (p.cs >= 0.9) { vCls = 'crit'; vTitle = 'Over-carburized';
+    vBody = `Surface is at ${p.cs.toFixed(2)} wt% C — carbide networks at the prior austenite boundaries. This is a rejectable condition for cyclic parts, not a "deeper case" bonus.`; }
+  else if (d === null) { vCls = 'warn'; vTitle = 'Deeper than the 3 mm window';
+    vBody = `The 0.40 wt% contour hasn't crossed 3 mm. Physically that means a deep, fully enriched case — fine for heavy sections, but check for grain coarsening and overload at this temperature/time before calling it a win.`; }
+  else if (depthMm < 0.8) { vCls = 'warn'; vTitle = 'Shallow case';
+    vBody = `${depthMm.toFixed(2)} mm at 0.40 wt% — below the typical 0.8–1.2 mm 8620H window. Expect lower bending-fatigue life than the datasheet promises.`; }
+  else if (p.cs >= 0.7) { vCls = 'warn'; vTitle = 'High surface carbon';
+    vBody = `Case depth ok, but ${p.cs.toFixed(2)} wt% surface means retained austenite; temper or refrigerate, and re-check hardness after.`; }
+  else { vCls = 'ok'; vTitle = 'Within carburizing practice';
+    vBody = `${depthMm.toFixed(2)} mm case at 0.40 wt% — a 50 HRC surface with a ductile core. This is the textbook outcome for 8620H.`; }
+  const v = $('verdict');
+  v.className = 'verdict ' + vCls;
+  v.innerHTML = `<b>${vTitle}</b>${vBody}`;
+}
+
+// ------------------------------------------------------------ growth chart
+function renderGrowth(p) {
+  const note = $('growthNote');
+  const ax = state.growthAxis === 'rt' ? 'rt' : 't';
+  const xv = (t) => (ax === 'rt' ? Math.sqrt(t) : t);
+  const N = 50, pts = [], dArr = [];
+  let tStar = null, lastFinite = 0;
+  for (let i = 0; i < N; i++) {
+    const tH = (i / (N - 1)) * 24;
+    const dep = solveCaseDepth(p.tempC, tH, p.cs, p.c0);
+    if (dep === null) { tStar = tH; break; }
+    dArr.push({ t: tH, depth: dep * 1000 });
+    lastFinite = tH;
+  }
+  const yFinal = dArr.length ? dArr[dArr.length - 1].depth : 0;
+  dArr.forEach(d => pts.push({ x: xv(d.t), y: d.depth }));
+  const parity = dArr.map(d => ({ x: xv(d.t), y: yFinal * Math.sqrt(d.t / 24) }));
+  const dCur = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  const curPt = (dCur !== null && tStar === null || dCur !== null && p.timeH <= lastFinite)
+    ? [{ x: xv(p.timeH), y: dCur * 1000 }] : [];
+  if (note) note.textContent = tStar === null
+    ? `Depth stays inside the 3 mm window across 0–24 h at this setting.`
+    : `Depth exceeds the 3 mm window beyond ~${tStar.toFixed(1)} h at this setting.`;
+  if (typeof Chart === 'undefined') return;
+  const ds = [{
+    label: 'Effective case depth', data: pts, parsing: false,
+    borderColor: '#f5a524', borderWidth: 2.5, tension: 0.3, pointRadius: 0, fill: false,
+  }, {
+    label: '√t parity', data: parity, parsing: false,
+    borderColor: '#8b96b0', borderWidth: 1.5, borderDash: [6, 5], tension: 0, pointRadius: 0, fill: false,
+  }];
+  if (curPt.length) ds.push({
+    label: 'selected', data: curPt, parsing: false, showLine: false,
+    borderColor: '#f5a524', backgroundColor: '#ffd166', pointRadius: 6, pointHoverRadius: 8,
+  });
+  const cfg = () => ({
+    data: { datasets: ds },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'nearest', intersect: false },
+      scales: {
+        x: { type: 'linear', min: 0, max: ax === 'rt' ? Math.sqrt(24) : 24,
+          title: { display: true, text: ax === 'rt' ? '√Time (√h)' : 'Time (h)', color: '#8b96b0', font: { family: "'JetBrains Mono', monospace", size: 12 } },
+          ticks: { color: '#8b96b0', font: { family: "'JetBrains Mono', monospace" } },
+          grid: { color: '#263049' } },
+        y: { min: 0, suggestedMax: Math.max(yFinal * 1.15, 1.2),
+          title: { display: true, text: 'Effective case depth (mm)', color: '#8b96b0', font: { family: "'JetBrains Mono', monospace", size: 12 } },
+          ticks: { color: '#8b96b0', font: { family: "'JetBrains Mono', monospace" } },
+          grid: { color: '#263049' } },
+      },
+      plugins: { legend: { display: false },
+        tooltip: { backgroundColor: '#1a2233', titleColor: '#ffd166', bodyColor: '#e7ebf4', borderColor: '#263049', borderWidth: 1,
+          callbacks: { label: it => `${it.dataset.label}: ${it.parsed.y.toFixed(2)} mm` } } },
+    },
+  });
+  if (state.growthChart) {
+    state.growthChart.data = cfg().data;
+    state.growthChart.options = cfg().options;
+    state.growthChart.update('none');
+    return;
+  }
+  const ctx = $('growthChart').getContext('2d');
+  state.growthChart = new Chart(ctx, { type: 'line', ...cfg() });
+}
+
+// ------------------------------------------------------------ hardness traverse
+function renderHardness(p) {
+  const note = $('hardnessNote');
+  const hv = (x) => martensiteHV(concentration(x / 1000, p.tempC, p.timeH, p.cs, p.c0));
+  const pts = [];
+  for (let i = 0; i <= 200; i++) { const x = (i / 200) * 3; pts.push({ x, y: hv(x) }); }
+  const line510 = [{ x: 0, y: 510 }, { x: 3, y: 510 }];
+  const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  const cross = d !== null ? [{ x: d * 1000, y: 510 }] : [];
+  if (note) note.textContent = `Surface ${Math.round(hv(0))} HV · core ${Math.round(hv(3))} HV${p.cs >= 0.7 ? ' · >0.7 wt% C ⇒ expect RA, measured hardness lower' : ''}`;
+  if (typeof Chart === 'undefined') return;
+  const ds = [{
+    label: 'HV (untempered martensite)', data: pts, parsing: false,
+    borderColor: '#f5a524', borderWidth: 3, tension: 0.35, pointRadius: 0, fill: false,
+  }, {
+    label: '510 HV (≈ 50 HRC)', data: line510, parsing: false,
+    borderColor: '#8b96b0', borderWidth: 1.5, borderDash: [6, 5], pointRadius: 0, fill: false,
+  }];
+  if (cross.length) ds.push({ label: 'case depth', data: cross, parsing: false, showLine: false,
+    borderColor: '#f87171', backgroundColor: '#f87171', pointRadius: 6, pointHoverRadius: 8 });
+  const cfg = () => ({
+    data: { datasets: ds },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'nearest', intersect: false },
+      scales: {
+        x: { type: 'linear', min: 0, max: 3,
+          title: { display: true, text: 'Depth from surface (mm)', color: '#8b96b0', font: { family: "'JetBrains Mono', monospace", size: 12 } },
+          ticks: { color: '#8b96b0', font: { family: "'JetBrains Mono', monospace" } },
+          grid: { color: '#263049' } },
+        y: { min: 100, suggestedMax: 1000,
+          title: { display: true, text: 'Hardness (HV)', color: '#8b96b0', font: { family: "'JetBrains Mono', monospace", size: 12 } },
+          ticks: { color: '#8b96b0', font: { family: "'JetBrains Mono', monospace" } },
+          grid: { color: '#263049' } },
+      },
+      plugins: { legend: { display: false },
+        tooltip: { backgroundColor: '#1a2233', titleColor: '#ffd166', bodyColor: '#e7ebf4', borderColor: '#263049', borderWidth: 1,
+          callbacks: { label: it => `${it.dataset.label}: ${Math.round(it.parsed.y)} HV @ ${it.parsed.x.toFixed(2)} mm` } } },
+    },
+  });
+  if (state.hardnessChart) {
+    state.hardnessChart.data = cfg().data;
+    state.hardnessChart.options = cfg().options;
+    state.hardnessChart.update('none');
+    return;
+  }
+  const ctx = $('hardnessChart').getContext('2d');
+  state.hardnessChart = new Chart(ctx, { type: 'line', ...cfg() });
+}
+
+// ------------------------------------------------------------ verification table
+function vRow(name, compare, result, pillCls, pillText) {
+  return `<tr><td>${name}</td><td class="muted">${compare}</td><td class="res">${result}</td><td><span class="pill ${pillCls}">${pillText}</span></td></tr>`;
+}
+
+function renderVerification(p) {
+  const D = diffusivity(p.tempC), t = p.timeH * 3600;
+  const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  const rows = [];
+  let anyFail = false;
+
+  // 1 — erf vs independent quadrature
+  let e1 = 0;
+  for (const x of [0, 0.5, 1, 1.5, 2]) e1 = Math.max(e1, Math.abs(erf(x) - (1 - erfcQuadrature(x))));
+  rows.push(vRow('erfc vs 1 − erf', 'Maclaurin erf vs Simpson quadrature on ∫₀^x e^{−u²}du', e1.toExponential(3), e1 < 1e-12 ? 'ok' : 'crit', e1 < 1e-12 ? 'PASS' : 'FAIL'));
+  if (e1 >= 1e-12) anyFail = true;
+
+  // 2 — mass balance: trapezoid vs truncated closed form
+  {
+    const L = 0.003, n = 500;
+    let trap = 0;
+    for (let i = 0; i <= n; i++) {
+      const x = (i / n) * L, w = (i === 0 || i === n) ? 0.5 : 1;
+      trap += w * (concentration(x, p.tempC, p.timeH, p.cs, p.c0) - p.c0);
+    }
+    trap *= L / n;
+    const closed = uptakeWithin(p.cs, p.c0, D, t, L);
+    const rel = closed !== 0 ? Math.abs(trap / closed - 1) : 1;
+    rows.push(vRow('Mass balance', '∫₀³mm (C−C₀)dx (trapezoid) vs truncated closed form', (rel * 100).toFixed(3) + ' %', rel < 0.005 ? 'ok' : 'crit', rel < 0.005 ? 'PASS' : 'FAIL'));
+    if (rel >= 0.005) anyFail = true;
+  }
+
+  // 3 — bisection residual
+  if (d === null) {
+    rows.push(vRow('Bisection residual', 'C(solveCaseDepth) − 0.40', 'n/a', 'ok', 'n/a'));
+  } else {
+    const r = Math.abs(concentration(d, p.tempC, p.timeH, p.cs, p.c0) - 0.4);
+    rows.push(vRow('Bisection residual', 'C(solveCaseDepth) − 0.40', r.toExponential(2), r < 1e-9 ? 'ok' : 'crit', r < 1e-9 ? 'PASS' : 'FAIL'));
+    if (r >= 1e-9) anyFail = true;
+  }
+
+  // 4 — FD vs erf, labeled fixed check case 920 °C · 1 h
+  {
+    const { c } = fdProfile(1.1, 0.2, 920, 1, 0.002, 240, false);
+    let maxErr = 0;
+    for (let i = 0; i < c.length; i++) {
+      const x = (i / (c.length - 1)) * 0.002;
+      maxErr = Math.max(maxErr, Math.abs(c[i] - concentration(x, 920, 1, 1.1, 0.2)));
+    }
+    rows.push(vRow('FD vs erf — fixed check case', '920 °C · 1 h · x ≤ 2 mm · n = 240, BE + Thomas', maxErr.toFixed(5) + ' wt%', maxErr < 0.01 ? 'ok' : 'crit', maxErr < 0.01 ? 'PASS' : 'FAIL'));
+    if (maxErr >= 0.01) anyFail = true;
+  }
+
+  // 5 — D window
+  const dOk = D > 1e-13 && D < 1e-9;
+  rows.push(vRow('D window', '2.3e−5·exp(−148000/RT), m²/s', D.toExponential(3), dOk ? 'ok' : 'crit', dOk ? 'PASS' : 'FAIL'));
+  if (!dOk) anyFail = true;
+
+  // 6 — DANTE refinement vs this model (info row)
+  {
+    const { c } = fdProfile(p.cs, p.c0, p.tempC, p.timeH, 0.003, 240, true);
+    let dDante = null;
+    for (let i = 1; i < c.length; i++) {
+      if (c[i - 1] > 0.4 && c[i] <= 0.4) {
+        const x0 = ((i - 1) / (c.length - 1)) * 0.003, x1 = (i / (c.length - 1)) * 0.003;
+        dDante = x0 + (0.4 - c[i - 1]) * (x1 - x0) / (c[i] - c[i - 1]);
+        break;
+      }
+    }
+    if (d === null || dDante === null) {
+      rows.push(vRow('DANTE D(T,C) refinement', 'Carbon-dependent D (DANTE-style), finite difference', d === null ? 'n/a (> 3 mm)' : '> 3 mm', 'info', 'INFO'));
+    } else {
+      const delta = ((dDante - d) / d) * 100;
+      rows.push(vRow('DANTE D(T,C) refinement', 'Carbon-dependent D (DANTE-style), finite difference', `${delta >= 0 ? '+' : ''}${delta.toFixed(1)} %`, 'info', 'INFO'));
+    }
+  }
+
+  $('vtable').querySelector('tbody').innerHTML = rows.join('');
+  $('vtable').classList.toggle('failed', anyFail);
+}
+
+// ------------------------------------------------------------ validity marker
+function renderValidity(p) {
+  const el = $('validityMark');
+  if (!el) return;
+  const pct = Math.min(100, Math.max(0, ((p.tempC - 800) / 300) * 100));
+  el.style.left = pct + '%';
+  el.title = `${Math.round(p.tempC)} °C`;
+}
+
 function updateStats(p) {
   const D = diffusivity(p.tempC);
   const exp = Math.floor(Math.log10(D));
@@ -677,6 +976,9 @@ function updateAll() {
   updateReadouts(p);
   updateStats(p);
   updateChart(p);
+  for (const fn of [renderConsequences, renderGrowth, renderHardness, renderVerification, renderValidity]) {
+    try { fn(p); } catch (err) { console.warn(fn.name + ' skipped:', err); }
+  }
 }
 
 for (const id of ['tempSlider', 'timeSlider', 'surfSlider', 'coreSlider']) {
@@ -699,6 +1001,28 @@ document.querySelectorAll('.preset').forEach(btn => {
     updateAll();
   });
 });
+
+// growth axis toggle (t vs √t)
+if ($('growthT') && $('growthRt')) {
+  for (const [id, axis] of [['growthT', 't'], ['growthRt', 'rt']]) {
+    $(id).addEventListener('click', () => {
+      state.growthAxis = axis;
+      $('growthT').setAttribute('aria-pressed', axis === 't');
+      $('growthRt').setAttribute('aria-pressed', axis === 'rt');
+      updateAll();
+    });
+  }
+}
+// D(T,C) overlay toggle on the profile chart (dataset index 1)
+if ($('showCD')) {
+  $('showCD').addEventListener('change', (e) => {
+    state.showCD = !!e.target.checked;
+    if (state.chart) {
+      state.chart.data.datasets[1].hidden = !state.showCD;
+      state.chart.update('none');
+    }
+  });
+}
 
 updateAll();
 // === APP END ===
