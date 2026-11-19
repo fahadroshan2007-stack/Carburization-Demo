@@ -100,6 +100,65 @@
   .note-card p { font-size:12px; color:#93a0bd; margin-top:6px; }
 
   footer { margin-top:22px; border-top:1px solid var(--line); padding-top:12px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:11px; font-family: var(--font-mono); }
+
+  .topnav { display:flex; gap:18px; font-family: var(--font-mono); font-size: 11.5px; }
+  .topnav a { color: var(--muted); text-decoration: none; letter-spacing:.04em; }
+  .topnav a:hover { color: var(--amber); }
+  @media (max-width: 640px) { .topnav { display:none; } }
+
+  .band { margin-top: 22px; }
+  .band-h { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .lede { color: #93a0bd; font-size: 12.5px; margin: -4px 0 12px; }
+
+  .verdict { border-radius: 12px; border: 1px solid var(--line); border-left: 3px solid var(--amber); background: var(--panel); padding: 14px 18px; font-size: 13px; margin-bottom: 14px; line-height: 1.6; }
+  .verdict b { display:block; font-family: var(--font-mono); font-size: 10px; letter-spacing:2px; text-transform:uppercase; color: var(--amber); margin-bottom: 6px; font-weight: 500; }
+  .verdict.ok { border-left-color:#34d399 } .verdict.ok b { color:#34d399 }
+  .verdict.warn { border-left-color:#f5a524 } .verdict.warn b { color:#f5a524 }
+  .verdict.crit { border-left-color:#f87171; border-color: rgba(248,113,113,.55); box-shadow: 0 0 0 1px rgba(248,113,113,.22) inset; } .verdict.crit b { color:#f87171 }
+
+  .cq-cards { display:grid; grid-template-columns: repeat(6, 1fr); gap:14px; }
+  @media (max-width: 1100px) { .cq-cards { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 640px) { .cq-cards { grid-template-columns: repeat(2, 1fr); } }
+  .cq { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display:flex; flex-direction:column; gap:8px; }
+  .cq h3 { font-size: 11px; font-family: var(--font-mono); letter-spacing: 1.3px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  .cq .big { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 19px; color:#fff; white-space: nowrap; }
+  .cq .big small { font-size: 11px; color: var(--muted); margin-left: 3px; }
+  .cq .sub { font-size: 11px; color: #93a0bd; line-height: 1.5; }
+  .pill { align-self: flex-start; font-family: var(--font-mono); font-size: 9px; letter-spacing: 1.3px; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+  .pill.ok { color:#34d399 } .pill.warn { color:#f5a524 } .pill.crit { color:#f87171 } .pill.info { color:#8b96b0 }
+  .meter { height: 8px; border-radius: 99px; background: var(--panel-2); position:relative; overflow:visible; }
+  .meter i { position:absolute; left:0; top:0; bottom:0; border-radius:99px; background: var(--amber); }
+  .meter b { position:absolute; top:-3px; bottom:-3px; width:2px; background:#e7ebf4; }
+
+  .charts2 { display:grid; grid-template-columns: 1fr 1fr; gap:22px; }
+  @media (max-width: 980px) { .charts2 { grid-template-columns: 1fr; } }
+  .canvas-wrap-sm { height: 300px; position: relative; }
+  .chart-note { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); margin-top: 10px; min-height: 15px; }
+  .mt-toggle { display:flex; gap:8px; }
+  .mt-toggle button { font-family: var(--font-mono); font-size:10.5px; color:var(--muted); border:1px solid var(--line); border-radius:8px; padding:6px 10px; background:var(--panel-2); cursor:pointer; }
+  .mt-toggle button[aria-pressed="true"] { color:#1a1206; background: var(--amber); border-color: var(--amber); font-weight: 700; }
+
+  .tbl-wrap { overflow-x:auto; background: var(--panel); border:1px solid var(--line); border-radius: 12px; }
+  .vtable { width:100%; border-collapse: collapse; font-size: 12px; }
+  .vtable th { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); text-align:left; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .vtable td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  .vtable tr:last-child td { border-bottom: 0; }
+  .vtable td.res { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+  .vtable th.num { text-align:right; }
+
+  .validity { position: relative; margin-bottom: 14px; padding-top: 6px; }
+  .wbar { position: relative; height: 44px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+  .wseg { position: absolute; top: 0; bottom: 0; display:flex; align-items:center; justify-content:center; font-family: var(--font-mono); font-size: 10px; text-align:center; padding: 0 4px; line-height: 1.2; color: var(--text); border-right: 1px solid var(--line); }
+  .wseg.sluggish { background: rgba(245,165,36,.20) } .wseg.practice { background: rgba(52,211,153,.16) } .wseg.grain { background: rgba(245,165,36,.30) } .wseg.beyond { background: rgba(248,113,113,.26) }
+  .wmark { position:absolute; top:-2px; bottom:8px; width:2px; background: var(--amber); box-shadow: 0 0 8px rgba(245,165,36,.7); }
+  .wscale { display:flex; justify-content: space-between; font-family: var(--font-mono); font-size: 9px; color: var(--muted); margin-top:6px; }
+  .left-out ul { margin-left: 18px; display:grid; gap:6px; font-size: 12px; color:#93a0bd; line-height: 1.55; padding-left: 4px; }
+  .refs { display:grid; gap:10px; font-size: 12px; color:#b9c2d8; padding-left: 20px; max-width: 100ch; }
+  .refs a { color: var(--amber); text-decoration: none; }
+  .refs a:hover { text-decoration: underline; }
+
+  .overlay-toggle { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); display:flex; align-items:center; gap:6px; cursor: pointer; }
+  .overlay-toggle input { accent-color: var(--amber); }
 </style>
 </head>
 <body>
@@ -112,6 +171,13 @@
       <div class="sub">1-D carbon diffusion into steel · semi-infinite solid, constant surface composition</div>
     </div>
   </div>
+  <nav class="topnav" aria-label="Sections">
+    <a href="#profile">Profile</a>
+    <a href="#growth">Growth</a>
+    <a href="#consequences">Consequences</a>
+    <a href="#verification">Verification</a>
+    <a href="#sources">Sources</a>
+  </nav>
   <div class="badge">Transport Phenomena · Final Project</div>
 </header>
 
@@ -158,7 +224,7 @@
       <div class="stat"><div class="k">Diffusion Length √(Dt)</div><div class="v" id="lenVal">–<small> mm</small></div></div>
     </div>
 
-    <div class="chart-panel">
+    <div class="chart-panel" id="profile">
       <div class="chart-head">
         <h2>Carbon Concentration Profile</h2>
         <div class="legend">
@@ -171,12 +237,42 @@
   </section>
 </main>
 
+<section class="band" id="consequences" aria-label="Consequences at the current settings">
+  <h2 class="band-h">Consequences at the current settings</h2>
+  <div class="verdict ok" id="verdict"></div>
+  <div class="cq-cards" id="cqCards"></div>
+</section>
+
+<section class="band charts2" id="growth" aria-label="Case growth and as-quenched hardness">
+  <div class="chart-panel">
+    <div class="chart-head">
+      <h2>Case Growth · Effective Case Depth</h2>
+      <div class="mt-toggle" role="group" aria-label="Time axis">
+        <button class="mt" id="growthT" aria-pressed="true">t (h)</button>
+        <button class="mt" id="growthRt" aria-pressed="false">√t (√h)</button>
+      </div>
+    </div>
+    <div class="canvas-wrap-sm"><canvas id="growthChart" aria-label="Effective case depth versus time"></canvas></div>
+    <div class="chart-note" id="growthNote"></div>
+  </div>
+  <div class="chart-panel">
+    <div class="chart-head">
+      <h2>As-Quenched Hardness Traverse</h2>
+    </div>
+    <div class="canvas-wrap-sm"><canvas id="hardnessChart" aria-label="Untempered martensite hardness versus depth"></canvas></div>
+    <div class="chart-note" id="hardnessNote"></div>
+  </div>
+</section>
+
 <div class="notes">
   <div class="note-card">
     <h3>Governing Equations</h3>
     <div class="eq" id="eq1"></div>
     <div class="eq" id="eq2"></div>
+    <div class="eq" id="eq3"></div>
+    <div class="eq" id="eq4"></div>
     <p>Effective case depth is the depth <em>x</em> at which <em>C</em>(<em>x</em>, <em>t</em>) = 0.40 wt%, solved by bisection on the profile.</p>
+    <p>D(T,C) is the DANTE-style carbon-dependent diffusivity; HV<sup>*</sup> is the true untempered-martensite hardness (Idohara et al., 2024). Real parts show retained austenite above ≈0.7 wt% C and measure lower.</p>
   </div>
   <div class="note-card">
     <h3>Assumptions</h3>
@@ -184,8 +280,66 @@
   </div>
 </div>
 
+<section class="band" id="verification" aria-label="Verification, recomputed live">
+  <h2 class="band-h">Verification, recomputed live</h2>
+  <p class="lede">Every check reruns whenever you move a slider, except the labeled fixed case.</p>
+  <div class="tbl-wrap">
+    <table class="vtable" id="vtable">
+      <thead><tr><th>Check</th><th>What it compares</th><th class="num">Result</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="band" id="validity" aria-label="Validity window">
+  <h2 class="band-h">Validity window</h2>
+  <div class="validity">
+    <div class="wbar" id="wbarV">
+      <div class="wseg sluggish" style="left:0%;width:15%">sluggish</div>
+      <div class="wseg practice" style="left:15%;width:55%">carburizing practice</div>
+      <div class="wseg grain" style="left:70%;width:13.33%">grain coarsening</div>
+      <div class="wseg beyond" style="left:83.33%;width:16.67%">above validity</div>
+    </div>
+    <div class="wmark" id="validityMark" style="left:40%"></div>
+    <div class="wscale"><span>800</span><span>845</span><span>1010</span><span>1050</span><span>1100 °C</span></div>
+  </div>
+  <div class="notes" style="margin-top:0;grid-template-columns:1.25fr 1fr">
+    <div class="note-card left-out">
+      <h3>Left out on purpose</h3>
+      <ul>
+        <li>Constant surface carbon (ideal equilibrium atmosphere) — no surface-reaction control</li>
+        <li>No carbide precipitation — above ≈0.9 wt% C the model says nothing about where that carbon goes</li>
+        <li>No austenite grain-growth law — why &gt;1010 °C is flagged, not simulated</li>
+        <li>No nitrogen — carbonitriding changes the diffusion picture entirely</li>
+        <li>No quench response or retained-austenite transformation — HV is the untempered value</li>
+        <li>No alloy drag on D (Cr/Mn/Si) — plain-steel Arrhenius only</li>
+        <li>Flat, semi-infinite geometry — no gears, teeth, corners, or edges</li>
+        <li>Single process step — no boost/diffuse cycles, no atmosphere-failure modes</li>
+        <li>Constant D — the erf solution assumes it; the D(T,C) overlay shows what changes when it doesn't</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h3>Why this window</h3>
+      <p>Gas carburizing practice runs ≈845–1010 °C. Below 845 °C the kinetics are sluggish and sub-A3 behavior creeps in; above ≈1010 °C austenite grain coarsening degrades core and case toughness. The 0.40 wt% dashed line on the profile chart is the same 50 HRC case-depth convention industry uses.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="sources" aria-label="Sources">
+  <h2 class="band-h">Sources</h2>
+  <ol class="refs">
+    <li>Idohara O., Misaka S., Takaki S. et al., “Estimation of True Hardness and Quantitative Evaluation of Auto-Tempering in As-Quenched Martensitic Steels,” <em>ISIJ International</em> 64(10):1599–1606 (2024). <a href="https://www.jstage.jst.go.jp/article/isijinternational/64/10/64_ISIJINT-2024-140/_html/-char/ja" target="_blank" rel="noopener">jstage.jst.go.jp</a></li>
+    <li>Lee S.-J., Matlock D.K., Van Tyne C.J., “An Empirical Model for Carbon Diffusion in Austenite Incorporating Alloying Element Effects,” <em>ISIJ International</em> 51(11):1903–1911 (2011). <a href="https://www.jstage.jst.go.jp/article/isijinternational/51/11/51_11_1903/_pdf" target="_blank" rel="noopener">jstage.jst.go.jp</a></li>
+    <li>Sims J., “Simulation tools to effectively calculate process” (DANTE), <em>Thermal Processing Magazine</em>, Feb 2020. <a href="https://www.thermalprocessing.com/simulation-tools-to-effectively-calculate-process" target="_blank" rel="noopener">thermalprocessing.com</a></li>
+    <li>Krauss G., “Martensite in steel: strength and structure,” <em>Materials Science and Engineering A</em> 273–275:40–57 (1999). <a href="https://www.sciencedirect.com/science/article/pii/S0921509399002889" target="_blank" rel="noopener">sciencedirect.com</a></li>
+    <li>Krauss G., “Microstructures and Properties of Carburized Steels,” in <em>Surface Hardening of Steels</em>, ASM International — author's hosted copy. <a href="https://wpfiles.mines.edu/wp-content/uploads/aspprc/ResearchMaterials/Publications/036-Krauss.pdf" target="_blank" rel="noopener">wpfiles.mines.edu</a></li>
+    <li>Bhadeshia H.K.D.H., “Diffusion of carbon in austenite,” <em>Metal Science</em> 15:477–478 (1981) — author's hosted copy. <a href="https://www.phase-trans.msm.cam.ac.uk/2002/carbon.diffusion.bhadeshia.metal.science.1981.pdf" target="_blank" rel="noopener">phase-trans.msm.cam.ac.uk</a></li>
+    <li>Mohrbacher H., “Metallurgical concepts for optimized processing and properties of carburizing steel,” <em>Advances in Manufacturing</em> 4:105–114 (2016), open access. <a href="https://link.springer.com/article/10.1007/s40436-016-0142-9" target="_blank" rel="noopener">link.springer.com</a></li>
+  </ol>
+</section>
+
 <footer>
-  <span>Transport Demo · Diffusion in Solids</span>
+  <span>Transport Demo · Diffusion in Solids · Physics &amp; verification checked live · sources below</span>
   <span>erf: Maclaurin series · Chart.js + Tailwind CDN · KaTeX</span>
 </footer>
 
@@ -559,6 +713,10 @@ try {
       document.getElementById('eq1'), { displayMode: true, throwOnError: false });
     katex.render(String.raw`C(x,t) = C_s - (C_s - C_0)\,\operatorname{erf}\!\left(\frac{x}{2 \sqrt{D \, t}}\right)`,
       document.getElementById('eq2'), { displayMode: true, throwOnError: false });
+    katex.render(String.raw`D(T,C) = 0.47\,e^{-1.6\,C}\,\exp\!\left(-\frac{37000 - 6600\,C}{1.986\,(T + 273.15)}\right) \;\; [\mathrm{cm^2\,s^{-1}}]`,
+      document.getElementById('eq3'), { displayMode: true, throwOnError: false });
+    katex.render(String.raw`HV^{*}\,[\mathrm{GPa}] = 1.75 + 8.2\,(wt\%\,C)`,
+      document.getElementById('eq4'), { displayMode: true, throwOnError: false });
   }
 } catch (err) {
   console.warn('KaTeX render skipped:', err);
