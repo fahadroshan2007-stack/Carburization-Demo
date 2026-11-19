@@ -678,6 +678,7 @@ function renderConsequences(p) {
     depthBody = 'C(3 mm) ≥ 0.40 wt% at this hold time — the 0.40 wt% contour has not reached the window edge yet. Increase hold time or shift to √(Dt) math.';
     meterFill = 100; showMarker = false;
   } else {
+    depthBig = depthMm.toFixed(2) + '<small> mm</small>';
     const okSpec = depthMm >= 0.8 && depthMm <= 1.2;
     const near = (depthMm >= 0.5 && depthMm < 0.8) || (depthMm > 1.2 && depthMm <= 1.5);
     depthPill = okSpec ? 'spec ok' : near ? 'near spec' : 'out of spec';
