@@ -30,6 +30,7 @@ function makeEl(id, { value = '', min = 0, max = 100, step = 1 } = {}) {
 }
 
 function buildDom() {
+  const tbody = makeEl('tbody');
   const els = {
     tempSlider: makeEl('tempSlider', { value: '800', min: 800, max: 1050, step: 1 }),
     timeSlider: makeEl('timeSlider', { value: '1', min: 1, max: 24, step: 0.5 }),
@@ -39,6 +40,21 @@ function buildDom() {
     surfVal: makeEl('surfVal'), coreVal: makeEl('coreVal'),
     dVal: makeEl('dVal'), depthVal: makeEl('depthVal'), lenVal: makeEl('lenVal'),
     depthCard: makeEl('depthCard'),
+    // depth-expansion sections
+    verdict: makeEl('verdict'), cqCards: makeEl('cqCards'),
+    cardDepth: makeEl('cardDepth'), cardSurfaceC: makeEl('cardSurfaceC'), cardHV: makeEl('cardHV'),
+    cardRA: makeEl('cardRA'), cardUptake: makeEl('cardUptake'), cardTime1mm: makeEl('cardTime1mm'),
+    growthChart: Object.assign(makeEl('growthChart'), {
+      getContext: () => ({ createLinearGradient: () => ({ addColorStop() {} }) }),
+    }),
+    hardnessChart: Object.assign(makeEl('hardnessChart'), {
+      getContext: () => ({ createLinearGradient: () => ({ addColorStop() {} }) }),
+    }),
+    growthNote: makeEl('growthNote'), hardnessNote: makeEl('hardnessNote'),
+    growthT: makeEl('growthT'), growthRt: makeEl('growthRt'),
+    validityMark: makeEl('validityMark'),
+    vtable: Object.assign(makeEl('vtable'), { querySelector: sel => (sel === 'tbody' ? tbody : undefined) }),
+    showCD: Object.assign(makeEl('showCD'), { checked: true }),
     profileChart: Object.assign(makeEl('profileChart'), {
       getContext: () => ({
         createLinearGradient: () => ({ addColorStop() {} }),
@@ -50,7 +66,7 @@ function buildDom() {
     querySelectorAll: () => [],
     querySelector: () => null,
   };
-  return { els, document };
+  return { els, document, tbody };
 }
 
 function load(dom) {
@@ -70,14 +86,14 @@ function load(dom) {
   assert.match(dom.els.tempVal.innerHTML ?? dom.els.tempVal.textContent, /800/);
 }
 
-// Case 2: core 0.50 wt% — profile never reaches 0.40, depth must read > 3.00 mm
+// Case 2: core 0.50 wt% — no 0.40 wt% contour can form (C₀ ≥ 0.40)
 {
   const dom = buildDom();
   const { els } = dom;
   els.coreSlider.value = '0.5';
   const { updateAll } = load(dom);
   updateAll();
-  assert.match(els.depthVal.innerHTML, /(?:>|&gt;)\s*3\.00/, `expected bounded-case-depth message, got: ${els.depthVal.innerHTML}`);
+  assert.match(els.depthVal.innerHTML, /n\/a/, `expected n/a for noContour case, got: ${els.depthVal.innerHTML}`);
   assert.ok(els.depthCard.classList.contains('beyond'), 'depth card should carry .beyond styling');
 }
 
@@ -107,13 +123,63 @@ function load(dom) {
   els.surfSlider.value = '1.10'; els.coreSlider.value = '0.20';
   const { updateAll } = load(dom);
   updateAll();
-  assert.equal(instances.length, 1, 'chart should be created once');
+  assert.equal(instances.length, 3, 'profile + growth + hardness charts created once');
   assert.equal(instances[0].data.datasets[0].data.length, 150);
   assert.ok(instances[0].$caseDepth > 0 && instances[0].$caseDepth < 0.003,
     `case depth out of range: ${instances[0].$caseDepth}`);
   els.tempSlider.value = '1050';
   updateAll();
-  assert.equal(instances.length, 1, 'slider drag must update, not recreate, the chart');
+  assert.equal(instances.length, 3, 'slider drag must update, not recreate, the charts');
+  delete global.Chart;
+}
+
+// Case 6: offline / no CDN at all — updateAll must not throw; cards and table still render
+{
+  delete global.Chart;
+  const dom = buildDom();
+  const { updateAll } = load(dom);
+  updateAll();
+  const { els, tbody } = dom;
+  assert.ok(!/NaN|undefined|Infinity/.test(els.cqCards.innerHTML), `cqCards not finite: ${els.cqCards.innerHTML}`);
+  assert.ok(els.cqCards.innerHTML.includes('mg/cm²'), 'uptake card must render');
+  assert.match(els.verdict.innerHTML, /Within carburizing practice|Shallow|Over-carburized|deeper than/, `verdict: ${els.verdict.innerHTML}`);
+  assert.ok(tbody.innerHTML.includes('FD vs erf'), 'verification table must render the FD row offline');
+  assert.ok((tbody.innerHTML.match(/PASS/g) || []).length >= 1, 'at least one row must pass');
+}
+
+// Case 7: core 0.50 wt% — depth is null everywhere; every renderer stays bounded
+{
+  delete global.Chart;
+  const dom = buildDom();
+  const { els, tbody } = dom;
+  els.tempSlider.value = '920'; els.timeSlider.value = '4';
+  els.surfSlider.value = '0.85'; els.coreSlider.value = '0.5';
+  const { updateAll } = load(dom);
+  updateAll();
+  assert.match(els.verdict.innerHTML, /No 0\.40 wt% case forms/i, `verdict: ${els.verdict.innerHTML}`);
+  assert.ok(els.cqCards.innerHTML.includes('no contour'), `cardDepth must degrade to the no-contour message: ${els.cqCards.innerHTML}`);
+  assert.ok(!/NaN/.test(els.cqCards.innerHTML), 'cqCards must not contain NaN');
+  assert.ok(tbody.innerHTML.includes('no contour'), 'bisection row must degrade to no contour');
+  assert.ok(els.growthNote.textContent.includes('No case forms'), `growth note: ${els.growthNote.textContent}`);
+}
+
+// Case 8: verification table renders live rows at defaults; uptake card formatted
+{
+  global.Chart = class {
+    constructor(ctx, cfg) { this.data = cfg.data; this.options = cfg.options; }
+    update() {}
+    destroy() {}
+  };
+  const dom = buildDom();
+  const { els, tbody } = dom;
+  els.tempSlider.value = '920'; els.timeSlider.value = '4';
+  els.surfSlider.value = '1.10'; els.coreSlider.value = '0.20';
+  const { updateAll } = load(dom);
+  updateAll();
+  assert.ok(!/NaN/.test(els.cqCards.innerHTML), 'cqCards must be finite');
+  assert.match(els.cqCards.innerHTML, /\d+\.\d{2}<small> mg\/cm²/, `uptake card: ${els.cqCards.innerHTML}`);
+  assert.ok(tbody.innerHTML.includes('920'), 'fixed check case must name its temperature');
+  assert.ok((tbody.innerHTML.match(/PASS/g) || []).length >= 4, `expected ≥4 PASS rows, got: ${tbody.innerHTML}`);
   delete global.Chart;
 }
 

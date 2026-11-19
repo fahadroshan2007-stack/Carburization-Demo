@@ -100,6 +100,67 @@
   .note-card p { font-size:12px; color:#93a0bd; margin-top:6px; }
 
   footer { margin-top:22px; border-top:1px solid var(--line); padding-top:12px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:11px; font-family: var(--font-mono); }
+
+  .topnav { display:flex; gap:18px; font-family: var(--font-mono); font-size: 11.5px; }
+  .topnav a { color: var(--muted); text-decoration: none; letter-spacing:.04em; }
+  .topnav a:hover { color: var(--amber); }
+  @media (max-width: 640px) { .topnav { display:none; } }
+
+  .band { margin-top: 22px; }
+  .band-h { font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .lede { color: #93a0bd; font-size: 12.5px; margin: -4px 0 12px; }
+
+  .verdict { border-radius: 12px; border: 1px solid var(--line); border-left: 3px solid var(--amber); background: var(--panel); padding: 14px 18px; font-size: 13px; margin-bottom: 14px; line-height: 1.6; }
+  .verdict b { display:block; font-family: var(--font-mono); font-size: 10px; letter-spacing:2px; text-transform:uppercase; color: var(--amber); margin-bottom: 6px; font-weight: 500; }
+  .verdict.ok { border-left-color:#34d399 } .verdict.ok b { color:#34d399 }
+  .verdict.warn { border-left-color:#f5a524 } .verdict.warn b { color:#f5a524 }
+  .verdict.crit { border-left-color:#f87171; border-color: rgba(248,113,113,.55); box-shadow: 0 0 0 1px rgba(248,113,113,.22) inset; } .verdict.crit b { color:#f87171 }
+
+  .cq-cards { display:grid; grid-template-columns: repeat(6, 1fr); gap:14px; }
+  @media (max-width: 1100px) { .cq-cards { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 640px) { .cq-cards { grid-template-columns: repeat(2, 1fr); } }
+  .cq { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display:flex; flex-direction:column; gap:8px; }
+  .cq h3 { font-size: 11px; font-family: var(--font-mono); letter-spacing: 1.3px; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+  .cq .big { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 19px; color:#fff; white-space: nowrap; }
+  .cq .big small { font-size: 11px; color: var(--muted); margin-left: 3px; }
+  .cq .sub { font-size: 11px; color: #93a0bd; line-height: 1.5; }
+  .pill { align-self: flex-start; font-family: var(--font-mono); font-size: 9px; letter-spacing: 1.3px; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+  .pill.ok { color:#34d399 } .pill.warn { color:#f5a524 } .pill.crit { color:#f87171 } .pill.info { color:#8b96b0 }
+  .meter { height: 8px; border-radius: 99px; background: var(--panel-2); position:relative; overflow:visible; }
+  .meter i { position:absolute; left:0; top:0; bottom:0; border-radius:99px; background: var(--amber); }
+  .meter b { position:absolute; top:-3px; bottom:-3px; width:2px; background:#e7ebf4; }
+
+  .charts2 { display:grid; grid-template-columns: 1fr 1fr; gap:22px; }
+  @media (max-width: 980px) { .charts2 { grid-template-columns: 1fr; } }
+  .canvas-wrap-sm { height: 300px; position: relative; }
+  .chart-note { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); margin-top: 10px; min-height: 15px; }
+  .mt-toggle { display:flex; gap:8px; }
+  .mt-toggle button { font-family: var(--font-mono); font-size:10.5px; color:var(--muted); border:1px solid var(--line); border-radius:8px; padding:6px 10px; background:var(--panel-2); cursor:pointer; }
+  .mt-toggle button[aria-pressed="true"] { color:#1a1206; background: var(--amber); border-color: var(--amber); font-weight: 700; }
+
+  .tbl-wrap { overflow-x:auto; background: var(--panel); border:1px solid var(--line); border-radius: 12px; }
+  .vtable { width:100%; border-collapse: collapse; font-size: 12px; }
+  .vtable th { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); text-align:left; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .vtable td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  .vtable tr:last-child td { border-bottom: 0; }
+  .vtable td.res { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; }
+  .vtable th.num { text-align:right; }
+  .vtable td.muted { color: #93a0bd; }
+  .vtable.failed { box-shadow: 0 0 0 1px rgba(248,113,113,.45) inset; }
+
+  .validity { position: relative; margin-bottom: 14px; padding-top: 6px; }
+  .wbar { position: relative; height: 44px; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+  .wseg { position: absolute; top: 0; bottom: 0; display:flex; align-items:center; justify-content:center; font-family: var(--font-mono); font-size: 10px; text-align:center; padding: 0 4px; line-height: 1.2; color: var(--text); border-right: 1px solid var(--line); }
+  .wseg.sluggish { background: rgba(245,165,36,.20) } .wseg.practice { background: rgba(52,211,153,.16) } .wseg.grain { background: rgba(245,165,36,.30) } .wseg.beyond { background: rgba(248,113,113,.26) }
+  .wmark { position:absolute; top:-2px; bottom:8px; width:2px; background: var(--amber); box-shadow: 0 0 8px rgba(245,165,36,.7); }
+  .wscale { display:flex; justify-content: space-between; font-family: var(--font-mono); font-size: 9px; color: var(--muted); margin-top:6px; }
+  .left-out ul { margin-left: 18px; display:grid; gap:6px; font-size: 12px; color:#93a0bd; line-height: 1.55; padding-left: 4px; }
+  .refs { display:grid; gap:10px; font-size: 12px; color:#b9c2d8; padding-left: 20px; max-width: 100ch; }
+  .refs a { color: var(--amber); text-decoration: none; }
+  .refs a:hover { text-decoration: underline; }
+
+  .overlay-toggle { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); display:flex; align-items:center; gap:6px; cursor: pointer; }
+  .overlay-toggle input { accent-color: var(--amber); }
 </style>
 </head>
 <body>
@@ -112,6 +173,13 @@
       <div class="sub">1-D carbon diffusion into steel · semi-infinite solid, constant surface composition</div>
     </div>
   </div>
+  <nav class="topnav" aria-label="Sections">
+    <a href="#profile">Profile</a>
+    <a href="#growth">Growth</a>
+    <a href="#consequences">Consequences</a>
+    <a href="#verification">Verification</a>
+    <a href="#sources">Sources</a>
+  </nav>
   <div class="badge">Transport Phenomena · Final Project</div>
 </header>
 
@@ -132,8 +200,8 @@
     </div>
 
     <div class="ctrl">
-      <div class="ctrl-head"><label for="surfSlider">Surface Carbon</label><div class="val" id="surfVal">1.10<small>wt%</small></div></div>
-      <input type="range" id="surfSlider" min="0.8" max="1.3" step="0.01" value="1.10" style="--fill:60%" aria-label="Surface carbon in weight percent">
+      <div class="ctrl-head"><label for="surfSlider">Surface Carbon</label><div class="val" id="surfVal">0.95<small>wt%</small></div></div>
+      <input type="range" id="surfSlider" min="0.8" max="1.3" step="0.01" value="0.95" style="--fill:30%" aria-label="Surface carbon in weight percent">
       <div class="ticks"><span>0.8</span><span>1.05</span><span>1.3</span></div>
     </div>
 
@@ -145,7 +213,7 @@
 
     <div class="label">Presets</div>
     <div class="presets">
-      <button class="preset active" data-t="920" data-time="4" data-cs="1.10" data-c0="0.20">8620H · 920°C · 4 h</button>
+      <button class="preset active" data-t="920" data-time="4" data-cs="0.95" data-c0="0.20">8620H · 920°C · 4 h</button>
       <button class="preset" data-t="950" data-time="6" data-cs="0.90" data-c0="0.10">1020 · 950°C · 6 h</button>
       <button class="preset" data-t="900" data-time="8" data-cs="1.15" data-c0="0.15">4320 · 900°C · 8 h</button>
     </div>
@@ -158,12 +226,14 @@
       <div class="stat"><div class="k">Diffusion Length √(Dt)</div><div class="v" id="lenVal">–<small> mm</small></div></div>
     </div>
 
-    <div class="chart-panel">
+    <div class="chart-panel" id="profile">
       <div class="chart-head">
         <h2>Carbon Concentration Profile</h2>
         <div class="legend">
-          <span><span class="dot" style="background:#f5a524"></span>C(x,t)</span>
+          <span><span class="dot" style="background:#f5a524"></span>C(x,t) erf · const-D</span>
+          <span><span class="dot" style="background:transparent;border-top:2px dashed #8b96b0;height:0;width:14px;border-radius:0"></span>D(T,C) DANTE</span>
           <span><span class="dot" style="background:transparent;border-top:2px dashed #f87171;height:0;width:14px;border-radius:0"></span>0.40 wt% limit</span>
+          <label class="overlay-toggle"><input type="checkbox" id="showCD" checked> D(T,C)</label>
         </div>
       </div>
       <div class="canvas-wrap"><canvas id="profileChart" aria-label="Carbon concentration versus depth chart"></canvas></div>
@@ -171,12 +241,42 @@
   </section>
 </main>
 
+<section class="band" id="consequences" aria-label="Consequences at the current settings">
+  <h2 class="band-h">Consequences at the current settings</h2>
+  <div class="verdict ok" id="verdict" aria-live="polite"></div>
+  <div class="cq-cards" id="cqCards"></div>
+</section>
+
+<section class="band charts2" id="growth" aria-label="Case growth and as-quenched hardness">
+  <div class="chart-panel">
+    <div class="chart-head">
+      <h2>Case Growth · Effective Case Depth</h2>
+      <div class="mt-toggle" role="group" aria-label="Time axis">
+        <button class="mt" id="growthT" aria-pressed="true">t (h)</button>
+        <button class="mt" id="growthRt" aria-pressed="false">√t (√h)</button>
+      </div>
+    </div>
+    <div class="canvas-wrap-sm"><canvas id="growthChart" aria-label="Effective case depth versus time"></canvas></div>
+    <div class="chart-note" id="growthNote"></div>
+  </div>
+  <div class="chart-panel">
+    <div class="chart-head">
+      <h2>As-Quenched Hardness Traverse</h2>
+    </div>
+    <div class="canvas-wrap-sm"><canvas id="hardnessChart" aria-label="Untempered martensite hardness versus depth"></canvas></div>
+    <div class="chart-note" id="hardnessNote"></div>
+  </div>
+</section>
+
 <div class="notes">
   <div class="note-card">
     <h3>Governing Equations</h3>
     <div class="eq" id="eq1"></div>
     <div class="eq" id="eq2"></div>
+    <div class="eq" id="eq3"></div>
+    <div class="eq" id="eq4"></div>
     <p>Effective case depth is the depth <em>x</em> at which <em>C</em>(<em>x</em>, <em>t</em>) = 0.40 wt%, solved by bisection on the profile.</p>
+    <p>D(T,C) is the DANTE-style carbon-dependent diffusivity; HV<sup>*</sup> is the true untempered-martensite hardness (Idohara et al., 2024). Real parts show retained austenite above ≈0.7 wt% C and measure lower.</p>
   </div>
   <div class="note-card">
     <h3>Assumptions</h3>
@@ -184,8 +284,66 @@
   </div>
 </div>
 
+<section class="band" id="verification" aria-label="Verification, recomputed live">
+  <h2 class="band-h">Verification, recomputed live</h2>
+  <p class="lede">Every check reruns whenever you move a slider, except the labeled fixed case.</p>
+  <div class="tbl-wrap">
+    <table class="vtable" id="vtable">
+      <thead><tr><th>Check</th><th>What it compares</th><th class="num">Result</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="band" id="validity" aria-label="Validity window">
+  <h2 class="band-h">Validity window</h2>
+  <div class="validity">
+    <div class="wbar" id="wbarV">
+      <div class="wseg sluggish" style="left:0%;width:15%">sluggish</div>
+      <div class="wseg practice" style="left:15%;width:55%">carburizing practice</div>
+      <div class="wseg grain" style="left:70%;width:13.33%">grain coarsening</div>
+      <div class="wseg beyond" style="left:83.33%;width:16.67%">above validity</div>
+    </div>
+    <div class="wmark" id="validityMark" style="left:40%"></div>
+    <div class="wscale"><span>800</span><span>845</span><span>1010</span><span>1050</span><span>1100 °C</span></div>
+  </div>
+  <div class="notes" style="margin-top:0;grid-template-columns:1.25fr 1fr">
+    <div class="note-card left-out">
+      <h3>Left out on purpose</h3>
+      <ul>
+        <li>Constant surface carbon (ideal equilibrium atmosphere) — no surface-reaction control</li>
+        <li>No carbide precipitation — above ≈0.9 wt% C the model says nothing about where that carbon goes</li>
+        <li>No austenite grain-growth law — why &gt;1010 °C is flagged, not simulated</li>
+        <li>No nitrogen — carbonitriding changes the diffusion picture entirely</li>
+        <li>No quench response or retained-austenite transformation — HV is the untempered value</li>
+        <li>No alloy drag on D (Cr/Mn/Si) — plain-steel Arrhenius only</li>
+        <li>Flat, semi-infinite geometry — no gears, teeth, corners, or edges</li>
+        <li>Single process step — no boost/diffuse cycles, no atmosphere-failure modes</li>
+        <li>Constant D — the erf solution assumes it; the D(T,C) overlay shows what changes when it doesn't</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h3>Why this window</h3>
+      <p>Gas carburizing practice runs ≈845–1010 °C. Below 845 °C the kinetics are sluggish and sub-A3 behavior creeps in; above ≈1010 °C austenite grain coarsening degrades core and case toughness. The 0.40 wt% dashed line on the profile chart is the same 50 HRC case-depth convention industry uses.</p>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="sources" aria-label="Sources">
+  <h2 class="band-h">Sources</h2>
+  <ol class="refs">
+    <li>Idohara O., Misaka S., Takaki S. et al., “Estimation of True Hardness and Quantitative Evaluation of Auto-Tempering in As-Quenched Martensitic Steels,” <em>ISIJ International</em> 64(10):1599–1606 (2024). <a href="https://www.jstage.jst.go.jp/article/isijinternational/64/10/64_ISIJINT-2024-140/_html/-char/ja" target="_blank" rel="noopener">jstage.jst.go.jp</a></li>
+    <li>Lee S.-J., Matlock D.K., Van Tyne C.J., “An Empirical Model for Carbon Diffusion in Austenite Incorporating Alloying Element Effects,” <em>ISIJ International</em> 51(11):1903–1911 (2011). <a href="https://www.jstage.jst.go.jp/article/isijinternational/51/11/51_11_1903/_pdf" target="_blank" rel="noopener">jstage.jst.go.jp</a></li>
+    <li>Sims J., “Simulation tools to effectively calculate process” (DANTE), <em>Thermal Processing Magazine</em>, Feb 2020. <a href="https://www.thermalprocessing.com/simulation-tools-to-effectively-calculate-process" target="_blank" rel="noopener">thermalprocessing.com</a></li>
+    <li>Krauss G., “Martensite in steel: strength and structure,” <em>Materials Science and Engineering A</em> 273–275:40–57 (1999). <a href="https://www.sciencedirect.com/science/article/pii/S0921509399002889" target="_blank" rel="noopener">sciencedirect.com</a></li>
+    <li>Krauss G., “Microstructures and Properties of Carburized Steels,” in <em>Surface Hardening of Steels</em>, ASM International — author's hosted copy. <a href="https://wpfiles.mines.edu/wp-content/uploads/aspprc/ResearchMaterials/Publications/036-Krauss.pdf" target="_blank" rel="noopener">wpfiles.mines.edu</a></li>
+    <li>Bhadeshia H.K.D.H., “Diffusion of carbon in austenite,” <em>Metal Science</em> 15:477–478 (1981) — author's hosted copy. <a href="https://www.phase-trans.msm.cam.ac.uk/2002/carbon.diffusion.bhadeshia.metal.science.1981.pdf" target="_blank" rel="noopener">phase-trans.msm.cam.ac.uk</a></li>
+    <li>Mohrbacher H., “Metallurgical concepts for optimized processing and properties of carburizing steel,” <em>Advances in Manufacturing</em> 4:105–114 (2016), open access. <a href="https://link.springer.com/article/10.1007/s40436-016-0142-9" target="_blank" rel="noopener">link.springer.com</a></li>
+  </ol>
+</section>
+
 <footer>
-  <span>Transport Demo · Diffusion in Solids</span>
+  <span>Transport Demo · Diffusion in Solids · Physics &amp; verification checked live · sources below</span>
   <span>erf: Maclaurin series · Chart.js + Tailwind CDN · KaTeX</span>
 </footer>
 
@@ -238,9 +396,120 @@ function profilePoints(tempC, timeH, cs, c0, n = 150) {
   }
   return pts;
 }
+
+// erfc by direct Simpson quadrature of ∫₀^x e^{-u²} du — a genuinely
+// independent algorithm to erf's Maclaurin series (quadrature vs series).
+function erfcQuadrature(x) {
+  if (x < 0) return 2 - erfcQuadrature(-x);
+  if (x === 0) return 1;
+  const n = 2048, h = x / n;
+  let s = 0;
+  for (let i = 0; i <= n; i++) {
+    const u = i * h;
+    s += (i === 0 || i === n ? 1 : (i % 2 ? 4 : 2)) * Math.exp(-u * u);
+  }
+  return 1 - (2 / Math.sqrt(Math.PI)) * (s * h / 3);
+}
+
+// Carbon mass (wt%·m) that has diffused INTO the solid within [0, L],
+// truncated closed form of the erf solution on the same interval
+// (compare against the semi-infinite 2(cs-c0)sqrt(Dt/pi) only at long times;
+// the truncated form stays valid for any t).
+function uptakeWithin(cs, c0, D, t, L) {
+  const a = L / (2 * Math.sqrt(D * t));
+  const sqpi = Math.sqrt(Math.PI);
+  return (cs - c0) * (L - 2 * Math.sqrt(D * t) * (a * erf(a) + Math.exp(-a * a) / sqpi - 1 / sqpi));
+}
+
+// Semi-infinite closed form: total carbon per unit area absorbed since t=0.
+function carbonUptake(cs, c0, D, t) {
+  return 2 * (cs - c0) * Math.sqrt((D * t) / Math.PI);
+}
+
+// Same, in mg/cm^2 (x 78.5 kg/m^2 per wt%·m, x 100 mg/cm^2 per kg/m^2).
+function carbonUptakeMgCm2(cs, c0, D, t) {
+  return carbonUptake(cs, c0, D, t) * 7850;
+}
+
+// Idohara et al. 2024 (ISIJ Int. 64:1599): true hardness of martensite with
+// carbon in fully solid solution, HV* [GPa] = 1.75 + 8.2 * mass %C. Uncapped;
+// above ~0.7 %C retained austenite caps the measured value (flagged in UI).
+function martensiteHV(cWt) {
+  return (1.75 + 8.2 * cWt) * 101.97;
+}
+
+// DANTE-style carbon-dependent austenite diffusivity (Thermal Processing
+// Magazine, Feb 2020, Eq. 2): D = 0.47 e^-1.6C exp(-(37000-6600C)/RT).
+// C in wt%; input cm^2/s; returned in m^2/s.
+function danteD(tempC, cWt) {
+  return 0.47 * Math.exp(-1.6 * cWt) *
+    Math.exp(-(37000 - 6600 * cWt) / (1.986 * (tempC + 273.15))) * 1e-4;
+}
+
+// Backward-Euler tridiagonal solver (Thomas). a/b/c coefficient arrays.
+function thomasSolve(a, b, c, d, n) {
+  const cp = new Float64Array(n), dp = new Float64Array(n), x = new Float64Array(n);
+  cp[0] = c[0] / b[0]; dp[0] = d[0] / b[0];
+  for (let i = 1; i < n; i++) {
+    const m = b[i] - a[i] * cp[i - 1];
+    cp[i] = c[i] / m; dp[i] = (d[i] - a[i] * dp[i - 1]) / m;
+  }
+  x[n - 1] = dp[n - 1];
+  for (let i = n - 2; i >= 0; i--) x[i] = dp[i] - cp[i] * x[i + 1];
+  return x;
+}
+
+// Finite-difference profile on [0, xMax_m] with n cells (n+1 nodes).
+// Backward Euler, Dirichlet c=cs at x=0, zero-flux at xMax (ghost-mirror).
+// carbonDep: D from danteD(tempC, c_node) on the previous step instead of
+// constant diffusivity(tempC). Returns meters and wt%.
+function fdProfile(cs, c0, tempC, timeH, xMax, n, carbonDep) {
+  const t = timeH * 3600, steps = 200, dt = t / steps, dx = xMax / n;
+  const x = new Array(n + 1), c = new Float64Array(n + 1);
+  for (let i = 0; i <= n; i++) x[i] = (i / n) * xMax;
+  for (let i = 0; i <= n; i++) c[i] = c0;
+  const D0 = diffusivity(tempC);
+  for (let step = 0; step < steps; step++) {
+    const a = new Float64Array(n + 1), b = new Float64Array(n + 1), cc = new Float64Array(n + 1), dvec = new Float64Array(n + 1);
+    dvec[0] = cs; b[0] = 1;
+    for (let i = 1; i <= n; i++) {
+      const Dl = carbonDep ? danteD(tempC, c[i - 1]) : D0;
+      const Di = carbonDep ? danteD(tempC, c[i]) : D0;
+      const Dr = carbonDep ? danteD(tempC, c[Math.min(n, i + 1)]) : D0;
+      const Dd = 0.5 * (Dl + Di), Du = 0.5 * (Di + Dr);   // harmonic-ish face averages
+      const al = (Dd / (dx * dx)), ar = (Du / (dx * dx));
+      a[i] = -dt * al; cc[i] = -dt * ar; b[i] = 1 + dt * (al + ar); dvec[i] = c[i];
+      if (i === n) { // zero-flux: replace right face flux with ghost mirror (Du = 0)
+        b[i] = 1 + dt * al; cc[i] = 0;
+      }
+    }
+    const out = thomasSolve(a, b, cc, dvec, n + 1);
+    for (let i = 0; i <= n; i++) c[i] = i === 0 ? cs : out[i];
+  }
+  return { x, c: Array.from(c) };
+}
+
+// Time (seconds) for the erf profile at temperature tempC to reach the
+// 0.40 wt% case depth at depth `target_m` (target < 3 mm). Bisection on t.
+// null when the depth never reaches target inside 200 h — or when no 0.40 wt%
+// contour can ever form (C0 >= 0.40, the profile never dips below it).
+function timeToCaseDepth(tempC, cs, c0, target_m) {
+  if (c0 >= 0.40) return null;
+  const depthAt = (tH) => {
+    const d = solveCaseDepth(tempC, tH, cs, c0);
+    return d === null ? Infinity : d; // deeper than the 3 mm window
+  };
+  if (depthAt(200) < target_m) return null;
+  let lo = 1e-6, hi = 200; // hours
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    if (depthAt(mid) >= target_m) hi = mid; else lo = mid;
+  }
+  return hi * 3600;
+}
 // === PHYSICS END ===
 // === APP START ===
-const state = { chart: null };
+const state = { chart: null, growthChart: null, hardnessChart: null, growthAxis: 't', showCD: true };
 const $ = id => document.getElementById(id);
 
 const caseDepthLine = {
@@ -284,8 +553,11 @@ function renderChart(p) {
   if (typeof Chart === 'undefined') return; // CDN unavailable — stats still work
   const pts = profilePoints(p.tempC, p.timeH, p.cs, p.c0).map(pt => ({ x: pt.x, y: pt.c }));
   const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  const cdProfile = fdProfile(p.cs, p.c0, p.tempC, p.timeH, 0.003, 240, true);
+  const ptsCD = cdProfile.x.map((x, i) => ({ x: x * 1000, y: cdProfile.c[i] }));
   if (state.chart) {
     state.chart.data.datasets[0].data = pts;
+    state.chart.data.datasets[1].data = ptsCD;
     state.chart.$caseDepth = d;
     state.chart.update('none');
     return;
@@ -298,7 +570,7 @@ function renderChart(p) {
     type: 'line',
     data: {
       datasets: [{
-        label: 'C(x,t)',
+        label: 'C(x,t) — erf constant-D',
         data: pts,
         parsing: false,
         borderColor: '#f5a524',
@@ -307,6 +579,17 @@ function renderChart(p) {
         pointRadius: 0,
         fill: true,
         backgroundColor: gradient,
+      }, {
+        label: 'D(T,C) — DANTE-style',
+        data: ptsCD,
+        parsing: false,
+        borderColor: '#8b96b0',
+        borderWidth: 2,
+        borderDash: [7, 5],
+        tension: 0.35,
+        pointRadius: 0,
+        fill: false,
+        hidden: !state.showCD,
       }],
     },
     options: {
@@ -373,6 +656,297 @@ function superscript(n) {
   return String(n).split('').map(ch => SUPERSCRIPT[ch] ?? ch).join('');
 }
 
+// ------------------------------------------------------------ consequences
+function renderConsequences(p) {
+  const D = diffusivity(p.tempC), t = p.timeH * 3600;
+  const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  const depthMm = d === null ? null : d * 1000;
+  const t1mm = timeToCaseDepth(p.tempC, p.cs, p.c0, 0.001);
+  const csHV = martensiteHV(p.cs), c0HV = martensiteHV(p.c0);
+  const uptake = carbonUptakeMgCm2(p.cs, p.c0, D, t);
+
+  // card 1 — case depth vs 0.50 mm schedule target (scale marks honest to the pinned D)
+  const noContour = p.c0 >= 0.40;
+  let depthBig, depthPill, depthPillCls, depthBody, meterFill, showMarker = true;
+  if (noContour) {
+    depthBig = 'n/a<small> —</small>'; depthPill = 'no contour'; depthPillCls = 'info';
+    depthBody = 'Core carbon is already at or above 0.40 wt% — the 0.40 wt% contour never forms, so no case depth is defined. This is a through-hardening carbon range, not a carburizing one.';
+    meterFill = 0; showMarker = false;
+  } else if (d === null) {
+    depthBig = '&gt; 3.00<small> mm</small>'; depthPill = 'deeper than window'; depthPillCls = 'crit';
+    depthBody = 'C(3 mm) ≥ 0.40 wt% at this hold time — the 0.40 wt% contour has not reached the far side yet. Increase hold time or raise the temperature.';
+    meterFill = 100; showMarker = false;
+  } else {
+    depthBig = depthMm.toFixed(2) + '<small> mm</small>';
+    const okSpec = depthMm >= 0.5;
+    const near = depthMm >= 0.35 && depthMm < 0.5;
+    depthPill = okSpec ? 'spec ok' : near ? 'near spec' : 'out of spec';
+    depthPillCls = okSpec ? 'ok' : near ? 'warn' : 'crit';
+    depthBody = `Depth of the 0.40 wt% contour — the 50 HRC case-depth definition. Scale shown to 1 mm; at longer holds or higher temperatures the same 0.40 line reaches 1+ mm.`;
+    meterFill = Math.min(100, (depthMm / 1.0) * 100);
+  }
+  const card1 = `<div class="card cq" id="cardDepth"><span class="pill ${depthPillCls}">${depthPill}</span><h3>Case depth @ 0.40 %C</h3>
+    <div class="big">${depthBig}</div>
+    <div class="meter"><i style="width:${meterFill}%"></i>${showMarker ? `<b style="left:50%"></b>` : ''}</div>
+    <p class="sub">${depthBody}</p></div>`;
+
+  // card 2 — surface carbon
+  const csPill = p.cs >= 1.10 ? 'crit' : p.cs >= 0.85 ? 'warn' : 'ok';
+  const csLabel = p.cs >= 1.10 ? 'carbide network' : p.cs >= 0.85 ? 'retained austenite' : 'in practice';
+  const card2 = `<div class="card cq" id="cardSurfaceC"><span class="pill ${csPill}">${csLabel}</span><h3>Surface carbon</h3>
+    <div class="big">${p.cs.toFixed(2)}<small> wt%</small></div>
+    <p class="sub">${p.cs >= 1.10 ? 'Over-carburization: continuous carbide networks embrittle the grain boundaries and fail the part on first load cycle.' : p.cs >= 0.85 ? 'Typical carburized surface — retained austenite expected; temper or refrigerate per practice.' : 'Common gas-carburizing surface range.'}</p></div>`;
+
+  // card 3 — as-quenched hardness
+  const card3 = `<div class="card cq" id="cardHV"><span class="pill info">untempered</span><h3>As-quenched hardness</h3>
+    <div class="big">${Math.round(csHV)}<small> HV</small></div>
+    <p class="sub">Core ${Math.round(c0HV)} HV · Idohara HV<sup>*</sup> [GPa] = 1.75 + 8.2·(%C) converted. True fully-solution martensite; real parts hold retained austenite above ≈0.7 wt% and measure lower.</p></div>`;
+
+  // card 4 — retained austenite risk
+  const raPill = p.cs >= 0.7 ? 'info' : p.cs >= 0.5 ? 'warn' : 'ok';
+  const raLabel = p.cs >= 0.7 ? 'expect RA' : p.cs >= 0.5 ? 'some RA' : 'low RA';
+  const card4 = `<div class="card cq" id="cardRA"><span class="pill ${raPill}">${raLabel}</span><h3>Retained austenite</h3>
+    <div class="big">${p.cs >= 0.7 ? 'present' : p.cs >= 0.5 ? 'watch' : 'minimal'}</div>
+    <p class="sub">${p.cs >= 0.7 ? 'RA expected; temper or refrigerate (e.g., −75 °C) to convert and stabilize the case.' : p.cs >= 0.5 ? 'Borderline — check with XRD if fatigue life matters.' : 'Below the RA-dominated regime.'}</p></div>`;
+
+  // card 5 — carbon uptake
+  const card5 = `<div class="card cq" id="cardUptake"><span class="pill info">semi-infinite</span><h3>Carbon taken up</h3>
+    <div class="big">${uptake.toFixed(2)}<small> mg/cm²</small></div>
+    <p class="sub">Closed form 2(Cs−C₀)√(Dt/π). This is the mass-balance row of the verification table, shown in shop-floor units.</p></div>`;
+
+  // card 6 — time to 1.0 mm
+  const card6 = `<div class="card cq" id="cardTime1mm"><span class="pill info">target 1.0 mm</span><h3>Time to 1.0 mm depth</h3>
+    <div class="big">${t1mm === null ? (p.c0 >= 0.40 ? 'n/a' : '&gt; 200') : (t1mm / 3600).toFixed(1)}<small>${p.c0 >= 0.40 ? '' : ' h'}</small></div>
+    <p class="sub">At ${Math.round(p.tempC)} °C, Cs ${p.cs.toFixed(2)} vs C₀ ${p.c0.toFixed(2)} wt%. Parity with the √t law: doubling the target costs 4× the time.</p></div>`;
+
+  $('cqCards').innerHTML = card1 + card2 + card3 + card4 + card5 + card6;
+
+  // verdict banner
+  let vCls, vTitle, vBody;
+  if (p.cs >= 1.10) { vCls = 'crit'; vTitle = 'Over-carburized';
+    vBody = `Surface is at ${p.cs.toFixed(2)} wt% C — carbide networks at the prior austenite boundaries. This is a rejectable condition for cyclic parts, not a "deeper case" bonus.`; }
+  else if (p.c0 >= 0.40) { vCls = 'warn'; vTitle = 'No 0.40 wt% case forms';
+    vBody = `Core carbon is already at ${p.c0.toFixed(2)} wt% — the 0.40 wt% contour never forms at any hold time or temperature. This is a through-hardening carbon range, not a carburizing schedule.`; }
+  else if (d === null) { vCls = 'warn'; vTitle = 'Deeper than the 3 mm window';
+    vBody = `The 0.40 wt% contour hasn't crossed 3 mm. Physically that means a deep, fully enriched case — fine for heavy sections, but check for grain coarsening and overload at this temperature/time before calling it a win.`; }
+  else if (depthMm < 0.5) { vCls = 'warn'; vTitle = 'Shallow case';
+    vBody = `${depthMm.toFixed(2)} mm at 0.40 wt% — expect reduced bending-fatigue life. Longer hold or hotter soak gets you past 0.5 mm.`; }
+  else { vCls = 'ok'; vTitle = 'Within carburizing practice';
+    vBody = `${depthMm.toFixed(2)} mm case at 0.40 wt% — a 50 HRC surface with a ductile core. Retained austenite is expected at this level of surface C; temper or refrigerate per practice.`; }
+  const v = $('verdict');
+  v.className = 'verdict ' + vCls;
+  v.innerHTML = `<b>${vTitle}</b>${vBody}`;
+}
+
+// ------------------------------------------------------------ growth chart
+function renderGrowth(p) {
+  const note = $('growthNote');
+  if (p.c0 >= 0.40) {
+    if (note) note.textContent = 'No case forms at C₀ ≥ 0.40 — the 0.40 wt% contour never exists.';
+    return; // leave any prior chart in place rather than paint a misleading empty one
+  }
+  const ax = state.growthAxis === 'rt' ? 'rt' : 't';
+  const xv = (t) => (ax === 'rt' ? Math.sqrt(t) : t);
+  const N = 50, pts = [], dArr = [];
+  let tStar = null, lastFinite = 0;
+  for (let i = 0; i < N; i++) {
+    const tH = (i / (N - 1)) * 24;
+    const dep = solveCaseDepth(p.tempC, tH, p.cs, p.c0);
+    if (dep === null) { tStar = tH; break; }
+    dArr.push({ t: tH, depth: dep * 1000 });
+    lastFinite = tH;
+  }
+  const yFinal = dArr.length ? dArr[dArr.length - 1].depth : 0;
+  dArr.forEach(d => pts.push({ x: xv(d.t), y: d.depth }));
+  const parity = dArr.map(d => ({ x: xv(d.t), y: yFinal * Math.sqrt(d.t / 24) }));
+  const dCur = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  const curPt = (dCur !== null && tStar === null || dCur !== null && p.timeH <= lastFinite)
+    ? [{ x: xv(p.timeH), y: dCur * 1000 }] : [];
+  if (note) note.textContent = tStar === null
+    ? `Depth stays inside the 3 mm window across 0–24 h at this setting.`
+    : `Depth exceeds the 3 mm window beyond ~${tStar.toFixed(1)} h at this setting.`;
+  if (typeof Chart === 'undefined') return;
+  const ds = [{
+    label: 'Effective case depth', data: pts, parsing: false,
+    borderColor: '#f5a524', borderWidth: 2.5, tension: 0.3, pointRadius: 0, fill: false,
+  }, {
+    label: '√t parity', data: parity, parsing: false,
+    borderColor: '#8b96b0', borderWidth: 1.5, borderDash: [6, 5], tension: 0, pointRadius: 0, fill: false,
+  }];
+  if (curPt.length) ds.push({
+    label: 'selected', data: curPt, parsing: false, showLine: false,
+    borderColor: '#f5a524', backgroundColor: '#ffd166', pointRadius: 6, pointHoverRadius: 8,
+  });
+  const cfg = () => ({
+    data: { datasets: ds },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'nearest', intersect: false },
+      scales: {
+        x: { type: 'linear', min: 0, max: ax === 'rt' ? Math.sqrt(24) : 24,
+          title: { display: true, text: ax === 'rt' ? '√Time (√h)' : 'Time (h)', color: '#8b96b0', font: { family: "'JetBrains Mono', monospace", size: 12 } },
+          ticks: { color: '#8b96b0', font: { family: "'JetBrains Mono', monospace" } },
+          grid: { color: '#263049' } },
+        y: { min: 0, suggestedMax: Math.max(yFinal * 1.15, 1.2),
+          title: { display: true, text: 'Effective case depth (mm)', color: '#8b96b0', font: { family: "'JetBrains Mono', monospace", size: 12 } },
+          ticks: { color: '#8b96b0', font: { family: "'JetBrains Mono', monospace" } },
+          grid: { color: '#263049' } },
+      },
+      plugins: { legend: { display: false },
+        tooltip: { backgroundColor: '#1a2233', titleColor: '#ffd166', bodyColor: '#e7ebf4', borderColor: '#263049', borderWidth: 1,
+          callbacks: { label: it => `${it.dataset.label}: ${it.parsed.y.toFixed(2)} mm` } } },
+    },
+  });
+  if (state.growthChart) {
+    state.growthChart.data = cfg().data;
+    state.growthChart.options = cfg().options;
+    state.growthChart.update('none');
+    return;
+  }
+  const ctx = $('growthChart').getContext('2d');
+  state.growthChart = new Chart(ctx, { type: 'line', ...cfg() });
+}
+
+// ------------------------------------------------------------ hardness traverse
+function renderHardness(p) {
+  const note = $('hardnessNote');
+  const hv = (x) => martensiteHV(concentration(x / 1000, p.tempC, p.timeH, p.cs, p.c0));
+  const pts = [];
+  for (let i = 0; i <= 200; i++) { const x = (i / 200) * 3; pts.push({ x, y: hv(x) }); }
+  const line510 = [{ x: 0, y: 510 }, { x: 3, y: 510 }];
+  const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  const cross = d !== null ? [{ x: d * 1000, y: 510 }] : [];
+  if (note) note.textContent = `Surface ${Math.round(hv(0))} HV · core ${Math.round(hv(3))} HV${p.cs >= 0.7 ? ' · >0.7 wt% C ⇒ expect RA, measured hardness lower' : ''}`;
+  if (typeof Chart === 'undefined') return;
+  const ds = [{
+    label: 'HV (untempered martensite)', data: pts, parsing: false,
+    borderColor: '#f5a524', borderWidth: 3, tension: 0.35, pointRadius: 0, fill: false,
+  }, {
+    label: '510 HV (≈ 50 HRC)', data: line510, parsing: false,
+    borderColor: '#8b96b0', borderWidth: 1.5, borderDash: [6, 5], pointRadius: 0, fill: false,
+  }];
+  if (cross.length) ds.push({ label: 'case depth', data: cross, parsing: false, showLine: false,
+    borderColor: '#f87171', backgroundColor: '#f87171', pointRadius: 6, pointHoverRadius: 8 });
+  const cfg = () => ({
+    data: { datasets: ds },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'nearest', intersect: false },
+      scales: {
+        x: { type: 'linear', min: 0, max: 3,
+          title: { display: true, text: 'Depth from surface (mm)', color: '#8b96b0', font: { family: "'JetBrains Mono', monospace", size: 12 } },
+          ticks: { color: '#8b96b0', font: { family: "'JetBrains Mono', monospace" } },
+          grid: { color: '#263049' } },
+        y: { min: 100, suggestedMax: 1000,
+          title: { display: true, text: 'Hardness (HV)', color: '#8b96b0', font: { family: "'JetBrains Mono', monospace", size: 12 } },
+          ticks: { color: '#8b96b0', font: { family: "'JetBrains Mono', monospace" } },
+          grid: { color: '#263049' } },
+      },
+      plugins: { legend: { display: false },
+        tooltip: { backgroundColor: '#1a2233', titleColor: '#ffd166', bodyColor: '#e7ebf4', borderColor: '#263049', borderWidth: 1,
+          callbacks: { label: it => `${it.dataset.label}: ${Math.round(it.parsed.y)} HV @ ${it.parsed.x.toFixed(2)} mm` } } },
+    },
+  });
+  if (state.hardnessChart) {
+    state.hardnessChart.data = cfg().data;
+    state.hardnessChart.options = cfg().options;
+    state.hardnessChart.update('none');
+    return;
+  }
+  const ctx = $('hardnessChart').getContext('2d');
+  state.hardnessChart = new Chart(ctx, { type: 'line', ...cfg() });
+}
+
+// ------------------------------------------------------------ verification table
+function vRow(name, compare, result, pillCls, pillText) {
+  return `<tr><td>${name}</td><td class="muted">${compare}</td><td class="res">${result}</td><td><span class="pill ${pillCls}">${pillText}</span></td></tr>`;
+}
+
+function renderVerification(p) {
+  const D = diffusivity(p.tempC), t = p.timeH * 3600;
+  const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
+  const rows = [];
+  let anyFail = false;
+
+  // 1 — erf vs independent quadrature
+  let e1 = 0;
+  for (const x of [0, 0.5, 1, 1.5, 2]) e1 = Math.max(e1, Math.abs(erf(x) - (1 - erfcQuadrature(x))));
+  rows.push(vRow('erfc vs 1 − erf', 'Maclaurin erf vs Simpson quadrature on ∫₀^x e^{−u²}du', e1.toExponential(3), e1 < 1e-12 ? 'ok' : 'crit', e1 < 1e-12 ? 'PASS' : 'FAIL'));
+  if (e1 >= 1e-12) anyFail = true;
+
+  // 2 — mass balance: trapezoid vs truncated closed form
+  {
+    const L = 0.003, n = 500;
+    let trap = 0;
+    for (let i = 0; i <= n; i++) {
+      const x = (i / n) * L, w = (i === 0 || i === n) ? 0.5 : 1;
+      trap += w * (concentration(x, p.tempC, p.timeH, p.cs, p.c0) - p.c0);
+    }
+    trap *= L / n;
+    const closed = uptakeWithin(p.cs, p.c0, D, t, L);
+    const rel = closed !== 0 ? Math.abs(trap / closed - 1) : 1;
+    rows.push(vRow('Mass balance', '∫₀³mm (C−C₀)dx (trapezoid) vs truncated closed form', (rel * 100).toFixed(3) + ' %', rel < 0.005 ? 'ok' : 'crit', rel < 0.005 ? 'PASS' : 'FAIL'));
+    if (rel >= 0.005) anyFail = true;
+  }
+
+  // 3 — bisection residual
+  if (d === null) {
+    rows.push(vRow('Bisection residual', 'C(solveCaseDepth) − 0.40', p.c0 >= 0.40 ? 'no contour' : 'n/a', 'ok', 'n/a'));
+  } else {
+    const r = Math.abs(concentration(d, p.tempC, p.timeH, p.cs, p.c0) - 0.4);
+    rows.push(vRow('Bisection residual', 'C(solveCaseDepth) − 0.40', r.toExponential(2), r < 1e-9 ? 'ok' : 'crit', r < 1e-9 ? 'PASS' : 'FAIL'));
+    if (r >= 1e-9) anyFail = true;
+  }
+
+  // 4 — FD vs erf, labeled fixed check case 920 °C · 1 h
+  {
+    const { c } = fdProfile(1.1, 0.2, 920, 1, 0.002, 240, false);
+    let maxErr = 0;
+    for (let i = 0; i < c.length; i++) {
+      const x = (i / (c.length - 1)) * 0.002;
+      maxErr = Math.max(maxErr, Math.abs(c[i] - concentration(x, 920, 1, 1.1, 0.2)));
+    }
+    rows.push(vRow('FD vs erf — fixed check case', '920 °C · 1 h · x ≤ 2 mm · n = 240, BE + Thomas', maxErr.toFixed(5) + ' wt%', maxErr < 0.01 ? 'ok' : 'crit', maxErr < 0.01 ? 'PASS' : 'FAIL'));
+    if (maxErr >= 0.01) anyFail = true;
+  }
+
+  // 5 — D window
+  const dOk = D > 1e-13 && D < 1e-9;
+  rows.push(vRow('D window', '2.3e−5·exp(−148000/RT), m²/s', D.toExponential(3), dOk ? 'ok' : 'crit', dOk ? 'PASS' : 'FAIL'));
+  if (!dOk) anyFail = true;
+
+  // 6 — DANTE refinement vs this model (info row)
+  {
+    const { c } = fdProfile(p.cs, p.c0, p.tempC, p.timeH, 0.003, 240, true);
+    let dDante = null;
+    for (let i = 1; i < c.length; i++) {
+      if (c[i - 1] > 0.4 && c[i] <= 0.4) {
+        const x0 = ((i - 1) / (c.length - 1)) * 0.003, x1 = (i / (c.length - 1)) * 0.003;
+        dDante = x0 + (0.4 - c[i - 1]) * (x1 - x0) / (c[i] - c[i - 1]);
+        break;
+      }
+    }
+    if (d === null || dDante === null) {
+      rows.push(vRow('DANTE D(T,C) refinement', 'Carbon-dependent D (DANTE-style), finite difference', d === null ? 'n/a (> 3 mm)' : '> 3 mm', 'info', 'INFO'));
+    } else {
+      const delta = ((dDante - d) / d) * 100;
+      rows.push(vRow('DANTE D(T,C) refinement', 'Carbon-dependent D (DANTE-style), finite difference', `${delta >= 0 ? '+' : ''}${delta.toFixed(1)} %`, 'info', 'INFO'));
+    }
+  }
+
+  $('vtable').querySelector('tbody').innerHTML = rows.join('');
+  $('vtable').classList.toggle('failed', anyFail);
+}
+
+// ------------------------------------------------------------ validity marker
+function renderValidity(p) {
+  const el = $('validityMark');
+  if (!el) return;
+  const pct = Math.min(100, Math.max(0, ((p.tempC - 800) / 300) * 100));
+  el.style.left = pct + '%';
+  el.title = `${Math.round(p.tempC)} °C`;
+}
+
 function updateStats(p) {
   const D = diffusivity(p.tempC);
   const exp = Math.floor(Math.log10(D));
@@ -385,7 +959,7 @@ function updateStats(p) {
   const d = solveCaseDepth(p.tempC, p.timeH, p.cs, p.c0);
   const depthCard = $('depthCard');
   if (d === null) {
-    $('depthVal').innerHTML = `&gt; 3.00<small> mm</small>`;
+    $('depthVal').innerHTML = p.c0 >= 0.40 ? `n/a<small> —</small>` : `&gt; 3.00<small> mm</small>`;
     depthCard.classList.add('beyond');
   } else {
     $('depthVal').innerHTML = `${(d * 1000).toFixed(2)}<small> mm</small>`;
@@ -406,6 +980,9 @@ function updateAll() {
   updateReadouts(p);
   updateStats(p);
   updateChart(p);
+  for (const fn of [renderConsequences, renderGrowth, renderHardness, renderVerification, renderValidity]) {
+    try { fn(p); } catch (err) { console.warn(fn.name + ' skipped:', err); }
+  }
 }
 
 for (const id of ['tempSlider', 'timeSlider', 'surfSlider', 'coreSlider']) {
@@ -429,6 +1006,28 @@ document.querySelectorAll('.preset').forEach(btn => {
   });
 });
 
+// growth axis toggle (t vs √t)
+if ($('growthT') && $('growthRt')) {
+  for (const [id, axis] of [['growthT', 't'], ['growthRt', 'rt']]) {
+    $(id).addEventListener('click', () => {
+      state.growthAxis = axis;
+      $('growthT').setAttribute('aria-pressed', axis === 't');
+      $('growthRt').setAttribute('aria-pressed', axis === 'rt');
+      updateAll();
+    });
+  }
+}
+// D(T,C) overlay toggle on the profile chart (dataset index 1)
+if ($('showCD')) {
+  $('showCD').addEventListener('change', (e) => {
+    state.showCD = !!e.target.checked;
+    if (state.chart) {
+      state.chart.data.datasets[1].hidden = !state.showCD;
+      state.chart.update('none');
+    }
+  });
+}
+
 updateAll();
 // === APP END ===
 </script>
@@ -442,6 +1041,10 @@ try {
       document.getElementById('eq1'), { displayMode: true, throwOnError: false });
     katex.render(String.raw`C(x,t) = C_s - (C_s - C_0)\,\operatorname{erf}\!\left(\frac{x}{2 \sqrt{D \, t}}\right)`,
       document.getElementById('eq2'), { displayMode: true, throwOnError: false });
+    katex.render(String.raw`D(T,C) = 0.47\,e^{-1.6\,C}\,\exp\!\left(-\frac{37000 - 6600\,C}{1.986\,(T + 273.15)}\right) \;\; [\mathrm{cm^2\,s^{-1}}]`,
+      document.getElementById('eq3'), { displayMode: true, throwOnError: false });
+    katex.render(String.raw`HV^{*}\,[\mathrm{GPa}] = 1.75 + 8.2\,(wt\%\,C)`,
+      document.getElementById('eq4'), { displayMode: true, throwOnError: false });
   }
 } catch (err) {
   console.warn('KaTeX render skipped:', err);
