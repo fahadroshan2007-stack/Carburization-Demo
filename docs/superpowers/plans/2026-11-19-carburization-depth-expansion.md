@@ -41,7 +41,7 @@
 
 **Interfaces:**
 - Consumes: existing `erf`, `diffusivity`, `concentration`, `solveCaseDepth`, `profilePoints`.
-- Produces (all pure, no DOM): `erfcContinued(x)`, `uptakeWithin(cs, c0, D, t, L)`, `carbonUptake(cs, c0, D, t)`, `carbonUptakeMgCm2(cs, c0, D, t)`, `martensiteHV(cWt)`, `danteD(tempC, cWt)`, `fdProfile(cs, c0, tempC, timeH, xMax, n, carbonDep)` → `{x:number[] (m), c:number[] (wt%)}`, `timeToCaseDepth(tempC, cs, c0, target_m)` → seconds `number|null`.
+- Produces (all pure, no DOM): `erfcQuadrature(x)`, `uptakeWithin(cs, c0, D, t, L)`, `carbonUptake(cs, c0, D, t)`, `carbonUptakeMgCm2(cs, c0, D, t)`, `martensiteHV(cWt)`, `danteD(tempC, cWt)`, `fdProfile(cs, c0, tempC, timeH, xMax, n, carbonDep)` → `{x:number[] (m), c:number[] (wt%)}`, `timeToCaseDepth(tempC, cs, c0, target_m)` → seconds `number|null`.
   - `uptakeWithin(cs, c0, D, t, L)` — truncated closed form `(cs−c0)·(L − 2√Dt·(a·erf a + e^{−a²}/√π − 1/√π))` with `a = L/(2√Dt)`; units wt%·m.
   - `carbonUptake` — `2·(cs−c0)·sqrt(D·t/Math.PI)` (wt%·m, semi-infinite).
   - `carbonUptakeMgCm2` — `carbonUptake × 7850` (mg/cm²; × 78.5 → kg/m², × 100 → mg/cm²).
@@ -54,13 +54,13 @@
 
 ```js
 const { erf, diffusivity, concentration, solveCaseDepth, profilePoints,
-        erfcContinued, uptakeWithin, carbonUptake, carbonUptakeMgCm2,
+        erfcQuadrature, uptakeWithin, carbonUptake, carbonUptakeMgCm2,
         martensiteHV, danteD, fdProfile, timeToCaseDepth } =
   new Function(`${match[1]}; return { erf, diffusivity, concentration, solveCaseDepth, profilePoints,
-    erfcContinued, uptakeWithin, carbonUptake, carbonUptakeMgCm2, martensiteHV, danteD, fdProfile, timeToCaseDepth };`)();
+    erfcQuadrature, uptakeWithin, carbonUptake, carbonUptakeMgCm2, martensiteHV, danteD, fdProfile, timeToCaseDepth };`)();
 
-// erfcContinued: independent algorithm, must agree with erf
-for (const x of [0, 0.5, 1, 1.5, 2]) assert.ok(Math.abs(erf(x) - (1 - erfcContinued(x))) < 1e-12, `erfcContinued(${x})`);
+// erfcQuadrature: independent algorithm, must agree with erf
+for (const x of [0, 0.5, 1, 1.5, 2]) assert.ok(Math.abs(erf(x) - (1 - erfcQuadrature(x))) < 1e-12, `erfcQuadrature(${x})`);
 
 // uptake: integral of our profile on [0, 3 mm] must match the truncated closed form
 {
@@ -106,8 +106,8 @@ assert.ok(danteD(950, 1.0) > danteD(950, 0.2), 'D(T,C) must rise with C');
 }
 ```
 
-- [ ] **Step 2: Run and confirm new asserts fail** — run `node tests/verify.mjs`; expected: fail with `ReferenceError`/`SyntaxError: erfcContinued is not defined` (functions missing). Existing asserts should still pass (they are before the new block).
-- [ ] **Step 3: Implement the eight functions** inside the PHYSICS block, after `profilePoints`. Signatures exactly as the Interfaces block. `erfcContinued` = standard modified-Lentz continued fraction on `1/(x + (1/2)/(x + 1/(x + (3/2)/…)))`, `erfc(x) = e^{−x²} / √π · (1/f)`. `fdProfile` = backward Euler tridiagonal (Thomas), Dirichlet left, ghost-mirror zero-flux right.
+- [ ] **Step 2: Run and confirm new asserts fail** — run `node tests/verify.mjs`; expected: fail with `ReferenceError`/`SyntaxError: erfcQuadrature is not defined` (functions missing). Existing asserts should still pass (they are before the new block).
+- [ ] **Step 3: Implement the eight functions** inside the PHYSICS block, after `profilePoints`. Signatures exactly as the Interfaces block. `erfcQuadrature` = standard modified-Lentz continued fraction on `1/(x + (1/2)/(x + 1/(x + (3/2)/…)))`, `erfc(x) = e^{−x²} / √π · (1/f)`. `fdProfile` = backward Euler tridiagonal (Thomas), Dirichlet left, ghost-mirror zero-flux right.
 - [ ] **Step 4: Run `node tests/verify.mjs`** — expected: `verify.mjs: all assertions passed`.
 - [ ] **Step 5: Commit**
 
@@ -254,7 +254,7 @@ git commit -m "test: smoke offline, null-depth, and live-verification coverage"
 ### Task 5: Manual verification sweep + AGENTS.md touch-up
 
 **Files:**
-- Modify: `AGENTS.md` (one line: the physics markers now additionally export `erfcContinued, uptakeWithin, carbonUptake(MgCm2), martensiteHV, danteD, fdProfile, timeToCaseDepth`; note the new sections ids; note verification row 4 is a labeled fixed case 920 °C/1 h)
+- Modify: `AGENTS.md` (one line: the physics markers now additionally export `erfcQuadrature, uptakeWithin, carbonUptake(MgCm2), martensiteHV, danteD, fdProfile, timeToCaseDepth`; note the new sections ids; note verification row 4 is a labeled fixed case 920 °C/1 h)
 - Manual: `file://` browser session
 
 - [ ] **Step 1: Browser check at `file://…/index.html`** — checklist: dark theme intact; header nav anchors scroll; profile chart renders + overlay checkbox toggles dashed curve; slider drag keeps all renderers updating without flicker; Consequences verdict banner changes color classes when dragging cs to 1.30 (crit) and to 0.8 spec shallow case (warn); Growth toggle switches t/√t labels; Hardness chart shows 510 HV dashed line and crossing dot; Verification table all rows PASS at defaults; drag T to 1050 °C + time 24 h (row 4 still PASS — fixed case); drag core to 0.50 (verdict + cards bounded); Validity marker moves with T; Sources links open (HTTP 200 on one sample); KaTeX eq3/eq4 render.

@@ -125,7 +125,7 @@ script) was rejected: splits plumbing and puts verification outside the test-vis
    "Recomputed whenever you move a slider; fixed-case rows say so", `#vtable` with
    `Check | What it compares | Result | Status`. Rows (rows 1,2,3,5,6 recompute live;
    row 4 is a fixed check case):
-   1. erfc vs 1−erf — max |erf(x) − (1 − erfcContinued(x))| on {0, 0.5, 1, 1.5, 2} — pass < 1e−13.
+   1. erfc vs 1−erf — max |erf(x) − (1 − erfcQuadrature(x))| on {0, 0.5, 1, 1.5, 2} — pass < 1e−13.
    2. Mass balance — ∫₀^3mm (C−C₀)dx (500-pt trapezoid of our profile) vs the **truncated** closed
       form M(L) = (Cs−C₀)·(L − 2√Dt·(a·erf a + e^{−a²}/√π − 1/√π)), a = L/(2√Dt), L = 3 mm —
       pass < 0.5 % rel. (Comparing against the semi-infinite total fails at high T·t — that was
@@ -163,7 +163,7 @@ script) was rejected: splits plumbing and puts verification outside the test-vis
 ### New pure physics (PHYSICS block only)
 
 ```js
-function erfcContinued(x)         // Lentz continued fraction; independent of Maclaurin erf
+function erfcQuadrature(x)         // Lentz continued fraction; independent of Maclaurin erf
 function carbonUptake(cs, c0, D, t) // 2(cs-c0)*sqrt(D*t/PI)  [wt%·m]
 function carbonUptakeMgCm2(cs, c0, D, t)  // carbonUptake × 7850 → mg/cm²  (= × 78.5 kg/m² × 100; ρ_steel = 7850 kg/m³)
 function martensiteHV(cWt)        // (1.75 + 8.2*cWt) * 101.97  [HV]
@@ -204,7 +204,7 @@ Append KaTeX: `D(T,C) = 0.47 e^{-1.6C} e^{-(37000 - 6600 C)/RT}` and
 ## Testing
 
 - `tests/verify.mjs`: add asserts for every new pure fn:
-  - `erfcContinued(1.5) + erf(1.5) ≈ 1` (1e-12), plus `≈ 2` on negative? No — erfc(-x) = 2 − erfc(x); assert `erfcContinued(-1.5) ≈ 2 - erfcContinued(1.5)`? Keep the single identity check + |erf−(1−erfcContinued)| on sample grid < 1e-12.
+  - `erfcQuadrature(1.5) + erf(1.5) ≈ 1` (1e-12), plus `≈ 2` on negative? No — erfc(-x) = 2 − erfc(x); assert `erfcQuadrature(-1.5) ≈ 2 - erfcQuadrature(1.5)`? Keep the single identity check + |erf−(1−erfcQuadrature)| on sample grid < 1e-12.
   - `carbonUptake` vs trapezoid of profilePoints-like sampling on [0, 3mm] with truncated closed
     form (same formula as row 2) — agreement < 0.5 %.
   - `martensiteHV(0.4)` ∈ [498, 528] HV; monotonic non-decreasing over 0.1…1.1.
